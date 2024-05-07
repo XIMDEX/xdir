@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\AuthCode;
 use Laravel\Passport\Client;
@@ -17,7 +18,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(UserService::class, function ($app) {
+            return new UserService(
+                $app->make(\Illuminate\Contracts\Auth\Guard::class),
+                $app->make(\Illuminate\Contracts\Hashing\Hasher::class)
+            );
+        });
     }
 
     /**
@@ -25,6 +31,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+        
     }
 }
