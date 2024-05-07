@@ -47,4 +47,14 @@ class AuthController extends Controller
         }
         
     }
+
+    public function update(RegisterRequest $request)
+    {
+        return "hola";
+        $data = $request->all();
+        
+        $updatedUser = $this->userService->updateUser($data);
+
+        return $updatedUser;
+    }
 }
