@@ -28,6 +28,7 @@ class UserService
         $user = User::create([
             'uuid' => $uuid,
             'name' => $data['name'],
+            'birthdate' => $data['birthdate'],
             'email' => $data['email'],
             'password' => $this->hasher->make($data['password'])
         ]);
@@ -62,6 +63,10 @@ class UserService
             }
             if (isset($data['password'])) {
                 $user->password = $this->hasher->make($data['password']);
+            }
+
+            if(isset($data['birthdate'])){
+                $user->birthdate = $data['birthdate'];
             }
 
             // Save the updated user
