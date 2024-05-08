@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\UserService;
-
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -36,10 +38,10 @@ class AuthController extends Controller
         try {
             $user = $this->userService->getUser($request->only('email', 'password'));
             if($user){
-                $user->makeHidden(['created_at', 'updated_at']);
+                $user->makeHidden(['created_at', 'updated_at','uuid']);
                 return response()->json(['user' => $user], 201);
             }
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'User not found'], 404);
         } catch (\Exception $e) {
              // Handle general errors
             \Log::error($e->getMessage());
@@ -48,13 +50,27 @@ class AuthController extends Controller
         
     }
 
-    public function update(RegisterRequest $request)
+    public function update(Request $request)
     {
-        return "hola";
         $data = $request->all();
         
         $updatedUser = $this->userService->updateUser($data);
+        if ($updatedUser instanceof JsonResponse) {
+            return $updatedUser;
+        }
+        $updatedUser->makeHidden(['created_at', 'updated_at','uuid']);
 
-        return $updatedUser;
+        return response()->json(['user' => $updatedUser]);
     }
+
+    public function validateToken(Request $request)
+   {
+       $user = Auth::guard('api')->user();
+       
+       if ($user) {
+           return response()->json(['message' => 'Token is valid', 'user' => $user]);
+       } else {
+           return response()->json(['message' => 'Token is invalid'], 401);
+       }
+   }
 }

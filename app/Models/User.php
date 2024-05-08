@@ -13,6 +13,9 @@ class User extends Authenticatable
 {
     use HasApiTokens,HasFactory, Notifiable, HasRoles;
     protected $primaryKey = 'uuid';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -31,6 +34,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'uuid',
         'password',
         'remember_token',
     ];
