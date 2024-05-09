@@ -12,23 +12,26 @@ class UserService
 
     protected $auth;
     protected $hasher;
+    protected $uuid;
+    protected $user;
 
-    public function __construct(Guard $auth, Hasher $hasher)
+    public function __construct(Guard $auth, Hasher $hasher, User $user)
     {
         $this->auth = $auth;
         $this->hasher = $hasher;
+        $this->user = $user;
     }
 
     public function createUser(array $data)
     {
-        // Generate a UUID
+
         $uuid = Uuid::uuid4();
 
         // Create the user with the UUID
-        $user = User::create([
+        $user = $this->user->create([
             'uuid' => $uuid,
             'name' => $data['name'],
-            'birthdate' => $data['birthdate'],
+            'birthdate' => $data['birthdate'] ?? null,
             'email' => $data['email'],
             'password' => $this->hasher->make($data['password'])
         ]);

@@ -21,7 +21,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserService::class, function ($app) {
             return new UserService(
                 $app->make(\Illuminate\Contracts\Auth\Guard::class),
-                $app->make(\Illuminate\Contracts\Hashing\Hasher::class)
+                $app->make(\Illuminate\Contracts\Hashing\Hasher::class),
+                $app->make(\App\Models\User::class)
             );
         });
     }

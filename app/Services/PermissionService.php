@@ -3,16 +3,24 @@
 namespace App\Services;
 
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\Validator;
-use Ramsey\Uuid\Uuid;
+
 
 class PermissionService
 {
+
+    protected $permission;
+    protected $uuidGenerator;
+
+    public function __construct(Permission $permission)
+    {
+           $this->permission = $permission;
+
+    }
+
     public function createPermission(array $data)
     {
-        $data['uuid'] = Uuid::uuid4();
-
-        $permission = Permission::create($data);
+        $data['uuid'] = $this->uuidGenerator->uuid4();
+        $permission = $this->permission->create($data);
 
         return [
             'success' => true,
