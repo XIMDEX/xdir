@@ -11,13 +11,4 @@ class Role extends SpatieRole
     use HasFactory;
     use HasUuids;
     protected $primaryKey = 'uuid';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-    ];
 }

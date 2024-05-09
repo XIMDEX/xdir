@@ -2,19 +2,27 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
 class RoleService{
 
-    public function createRole(Request $request){
-        $data['uuid'] = Uuid::uuid4();
+    protected $role; 
 
-        $permission = Role::create($data);
+    public function __construct(Role $role)
+    {
+        $this->role =  $role;
+    }
+
+    public function createRole(Array $data){
+        $data['uuid'] = Uuid::uuid4();
+        //$data['guard_name'] = "api";
+        $role = $this->role->create($data);
 
         return [
             'success' => true,
-            'permission' => $permission
+            'role' => $role
         ];
     }
 }

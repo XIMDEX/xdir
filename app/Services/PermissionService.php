@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Permission;
 
 
@@ -19,7 +20,7 @@ class PermissionService
 
     public function createPermission(array $data)
     {
-        $data['uuid'] = $this->uuidGenerator->uuid4();
+        $data['uuid'] = Uuid::uuid4();
         $permission = $this->permission->create($data);
 
         return [
