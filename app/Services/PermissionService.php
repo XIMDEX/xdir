@@ -22,20 +22,7 @@ class PermissionService
 
     public function updatePermission(Permission $permission, array $data)
     {
-        $validator = Validator::make($data, [
-            'name' => 'required|string|unique:permissions,name,' . $permission->id,
-            'guard_name' => 'sometimes|string'
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'errors' => $validator->errors()
-            ];
-        }
-
-        $permission->update($validator->validated());
-
+        $permission->update($data);
         return [
             'success' => true,
             'permission' => $permission

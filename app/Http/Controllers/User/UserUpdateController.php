@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\UserService;
-
+use Illuminate\Http\JsonResponse;
 
 class UserUpdateController extends Controller
 {
@@ -17,14 +17,18 @@ class UserUpdateController extends Controller
         $this->userService = $userService;
     }
 
-    public function updateUser($userId, array $userData)
+    public function updateUser(Request $request)
     {
         try {
-            // Call the UserService method to update the user
-            $user = $this->userService->updateUser($userId, $userData);
+            $data = $request->all();
 
-            // Return a JSON response with the updated user data
-            return response()->json(['user' => $user], 200);
+            $updatedUser = $this->userService->updateUser($data);
+            if ($updatedUser instanceof JsonResponse) {
+                return $updatedUser;
+            }
+            $updatedUser->makeHidden(['created_at', 'updated_at', 'uuid']);
+
+            return response()->json(['user' => $updatedUser]);
         } catch (\Exception $e) {
             // Log the error internally
             \Log::error($e);

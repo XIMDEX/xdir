@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Permissions;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
+use App\Models\Permission;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,9 @@ class PermissionController extends Controller
     {
         $this->permissionService = $permissionService;
     }
-    // Method to create a new permission
+
     public function create(PermissionRequest $request)
     {
-
         try {
             $result = $this->permissionService->createPermission($request->all());
 
@@ -30,25 +30,29 @@ class PermissionController extends Controller
             return response()->json(['message' => 'Permission created successfully', 'permission' => $result['permission']], 201);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred while updating user'], 500);
+            return response()->json(['error' => 'An error occurred while creating Permission'], 500);
         }
     }
 
-    // Method to update an existing permission
-    public function update(Request $request, Permission $permission)
+
+    public function update(PermissionRequest $request, $permissionId)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|unique:permissions,name,' . $permission->id,
-            'guard_name' => 'sometimes|string'
-        ]);
+        try {
+            $permission = Permission::find($permissionId);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            $result = $this->permissionService->updatePermission($permission, $request->all());
+
+            if (!$result['success']) {
+                return response()->json(['errors' => $result['errors']], 422);
+            }
+
+            $permission = $result['permission'];
+
+            return response()->json(['message' => 'Permission updated successfully', 'permission' => $permission]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while updating Permission'], 500);
         }
-
-        $permission->update($validator->validated());
-
-        return response()->json(['message' => 'Permission updated successfully', 'permission' => $permission]);
     }
 
     // Method to remove an existing permission
@@ -57,5 +61,17 @@ class PermissionController extends Controller
         $permission->delete();
 
         return response()->json(['message' => 'Permission removed successfully']);
+    }
+
+    public function getList()
+    {
+        try {
+            $permissions = Permission::all();
+            $permissions->makeHidden(['created_at', 'updated_at', 'guard_name']);
+            return response()->json(['permissions' => $permissions]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching permissions'], 500);
+        }
     }
 }
