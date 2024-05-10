@@ -25,4 +25,14 @@ class RoleService{
             'role' => $role
         ];
     }
+
+    public function updateRole(Array $data, $id){
+        $role = $this->role->find($id);
+        $role->update($data);
+        
+        return [
+            'success' => true,
+            'role' => $role
+        ];
+    }
 }
