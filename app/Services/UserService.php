@@ -44,8 +44,11 @@ class UserService
     {
         $this->auth->attempt($data);
         $user = $this->auth->user();
-        $user->token = $user->createToken(env('PASSPORT_TOKEN_NAME'))->accessToken;
-        return $user;
+        if ($user) {
+            $user->token = $user->createToken('ximdex')->accessToken;
+            return $user;
+        }
+       return null;
     }
 
     public function updateUser(array $data)
