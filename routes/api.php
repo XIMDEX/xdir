@@ -17,3 +17,5 @@ Route::get('/permissions', [PermissionController::class, 'getList'])->name('api.
 Route::post('/role/create',[RoleController::class,'create'])->name('api.roles.create')->middleware('auth:api');
 Route::post('/role/update/{roleId}',[RoleController::class,'update'])->name('api.roles.update')->middleware('auth:api');
 Route::get('/roles', [RoleController::class, 'getList'])->name('api.roles.list')->middleware('auth:api');
+Route::post( '/role/assign', [RoleController::class, 'assignRole'])->name('api.roles.assign')->middleware('auth:api');
+Route::post( '/role/unassign', [RoleController::class, 'unassignRole'])->name('api.roles.unassign')->middleware('auth:api');
