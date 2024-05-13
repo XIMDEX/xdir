@@ -45,4 +45,6 @@ class RoleController extends Controller
         $roles->makeHidden(['created_at', 'updated_at', 'guard_name']);
         return response()->json(['roles' => $roles]);
     }
+
+    
 }
