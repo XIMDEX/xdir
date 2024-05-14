@@ -48,10 +48,8 @@ class PermissionService
         ];
     }
 
-    public function isPermissionUnassigned($permissionId)
+    public function isPermissionUnassigned($permission)
     {
-        $permission = Permission::findById($permissionId);
-
         if (!$permission) {
             throw new Exception("Permission not found");
         }

@@ -57,12 +57,12 @@ class PermissionController extends Controller
     }
 
     // Method to remove an existing permission
-    public function remove($permissionId)
+    public function delete($permissionId)
     {
         try {
             $permission = Permission::findOrFail($permissionId);
             
-            if ($this->permissionService->isPermissionUnassigned($permissionId)) {
+            if ($this->permissionService->isPermissionUnassigned($permission)) {
                 $this->permissionService->deletePermission($permission);
                 return response()->json(['message' => 'Permission removed successfully']);
             } else {
