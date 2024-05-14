@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
 use App\Models\Permission;
 use App\Services\PermissionService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -56,11 +57,22 @@ class PermissionController extends Controller
     }
 
     // Method to remove an existing permission
-    public function remove(Permission $permission)
+    public function remove($permissionId)
     {
-        $permission->delete();
-
-        return response()->json(['message' => 'Permission removed successfully']);
+        try {
+            $permission = Permission::findOrFail($permissionId);
+            
+            if ($this->permissionService->isPermissionUnassigned($permissionId)) {
+                $this->permissionService->deletePermission($permission);
+                return response()->json(['message' => 'Permission removed successfully']);
+            } else {
+                return response()->json(['error' => 'Permission is assigned to a role'], 422);
+            }
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Permission not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while processing the request'], 500);
+        }
     }
 
     public function getList()

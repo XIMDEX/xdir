@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Role;
+use Exception;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
@@ -34,5 +35,17 @@ class RoleService{
             'success' => true,
             'role' => $role
         ];
+    }
+
+    public function removePermissionFromRole(Role $role, $permission)
+    {
+        if (!$role->hasPermissionTo($permission)) {
+            throw new Exception('Role does not have the specified permission');
+        }
+        try {
+            $role->revokePermissionTo($permission);
+        } catch (Exception $e) {
+            throw new Exception('Error revoking permission from role: ' . $e->getMessage());
+        }
     }
 }

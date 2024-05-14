@@ -40,6 +40,21 @@ class RoleController extends Controller
         return response()->json(['message' => 'Role update successfully', 'role' => $result['role']], 201);
     }
 
+    public function remove(Request $request, $roleId)
+{
+    try {
+        $result = $this->roleService->removeRole($roleId);
+
+        if (!$result['success']) {
+            return response()->json(['errors' => $result['errors']], 422);
+        }
+
+        return response()->json(['message' => 'Role removed successfully'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
     public function getList(){
         $roles = Role::all();
         $roles->makeHidden(['created_at', 'updated_at', 'guard_name']);
