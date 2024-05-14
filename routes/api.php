@@ -23,5 +23,7 @@ Route::get('/roles', [RoleController::class, 'getList'])->name('api.roles.list')
 Route::post( '/role/assign', [AssignRoleController::class, 'assignRoleToUser'])->name('api.roles.assign')->middleware('auth:api');
 Route::post( '/role/unassign', [AssignRoleController::class, 'unassignRole'])->name('api.roles.unassign')->middleware('auth:api');
 Route::post('/role/assign/permission', [AssignRoleController::class, 'addPermissionToRole'])->name('api.roles.add.permission')->middleware('auth:api');
-Route::post('/role/unassign/permission', [AssignRoleController::class, 'removePermissionFromRole'])->name('api.roles.remove.permission')->middleware('auth:api');
+Route::post('/role/unassign/permission', [AssignRoleController::class, 'revokePermissionFromRole'])->name('api.roles.remove.permission')->middleware('auth:api');
+
+
 
