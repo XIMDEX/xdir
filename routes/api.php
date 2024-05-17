@@ -1,15 +1,19 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Organization\OrganizationController;
 use App\Http\Controllers\Permissions\PermissionController;
 use App\Http\Controllers\Roles\AssignRoleController;
 use App\Http\Controllers\Roles\RoleController;
+use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\UserUpdateController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register'])->name('api.register');
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 Route::put('/user/update',[UserUpdateController::class,'update'])->name('api.user.update')->middleware('auth:api');
+Route::get('/users', [UserController::class, 'listUsers'])->name('api.users.list')->middleware('auth:api');
+
 
 Route::post('/permission/create',[PermissionController::class,'create'])->name('api.permission.create')->middleware('auth:api');
 Route::delete('/permission/remove/{permissionId}',[PermissionController::class,'delete'])->name('api.permission.delete')->middleware('auth:api');
@@ -25,5 +29,5 @@ Route::post( '/role/unassign', [AssignRoleController::class, 'unassignRole'])->n
 Route::post('/role/assign/permission', [AssignRoleController::class, 'addPermissionToRole'])->name('api.roles.add.permission')->middleware('auth:api');
 Route::post('/role/unassign/permission', [AssignRoleController::class, 'revokePermissionFromRole'])->name('api.roles.remove.permission')->middleware('auth:api');
 
-
+Route::post('/organization/create', [OrganizationController::class, 'create'])->name('api.organization.create')->middleware('auth:api');
 
