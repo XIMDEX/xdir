@@ -48,7 +48,7 @@ class UserService
             $user->token = $user->createToken('ximdex')->accessToken;
             return $user;
         }
-       return null;
+        return null;
     }
 
     public function updateUser(array $data)
@@ -71,7 +71,7 @@ class UserService
                 $user->password = $this->hasher->make($data['password']);
             }
 
-            if(isset($data['birthdate'])){
+            if (isset($data['birthdate'])) {
                 $user->birthdate = $data['birthdate'];
             }
 
@@ -105,5 +105,10 @@ class UserService
             }
         }
         return false;
+    }
+
+    public function getAllUsers()
+    {
+        return User::all();
     }
 }
