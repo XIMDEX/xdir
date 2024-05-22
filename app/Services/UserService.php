@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\UserDetailMail;
 use App\Models\User;
+use Exception;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Mail;
@@ -26,19 +27,42 @@ class UserService
 
     public function createUser(array $data)
     {
-        $uuid = Uuid::uuid4();
-        $user = [
-            'uuid' => $uuid,
-            'name' => $data['name'],
-            'birthdate' => $data['birthdate'] ?? null,
-            'email' => $data['email'],
-            'password' => $this->hasher->make($data['password'])
-        ];
-        $jsonUser = json_encode($user);
+        try {
+            // Generate UUID and create user data array
+            $uuid = Uuid::uuid4();
+            $user = [
+                'uuid' => $uuid,
+                'name' => $data['name'],
+                'birthdate' => $data['birthdate'] ?? null,
+                'email' => $data['email'],
+                'password' => $this->hasher->make($data['password'])
+            ];
+    
+            // Convert user data to JSON and then to Base64
+            $jsonUser = json_encode($user);
+            $base64User = base64_encode($jsonUser);
+    
+            // Send email
+           
+            Mail::to($data['email'])->send(new UserDetailMail($base64User));
+            // Return true if everything went well
+            return $base64User;
+        } catch (Exception $e) {
+            // Log the error
+            \Log::error("Failed to create user and send email: " . $e->getMessage());
+    
+            // Return false if there was an error
+            return false;
+        }
+    }
 
-        $base64User = base64_encode($jsonUser);
-        //$user->token = $user->createToken('ximdex')->accessToken;
-        Mail::to($data['email'])->send(new UserDetailMail($base64User));
+    public function registerUser($data){
+       /* if (!is_array($data)) {
+            throw new \Exception("Invalid user data");
+        }*/
+        $user = $this->user->create(get_object_vars($data));
+        $user->access_token = $user->createToken('ximdex')->accessToken;
+
         return $user;
     }
 

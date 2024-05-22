@@ -7,9 +7,15 @@ use App\Http\Controllers\Roles\AssignRoleController;
 use App\Http\Controllers\Roles\RoleController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\UserUpdateController;
+use App\Http\Controllers\verification\VerificationController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+
+
 Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+Route::get( '/email/verify/{code}',[VerificationController::class,'verify'])->name('api.verify');
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 Route::put('/user/update',[UserUpdateController::class,'update'])->name('api.user.update')->middleware('auth:api');
 Route::get('/users', [UserController::class, 'listUsers'])->name('api.users.list')->middleware('auth:api');
@@ -31,3 +37,6 @@ Route::post('/role/unassign/permission', [AssignRoleController::class, 'revokePe
 
 Route::post('/organization/create', [OrganizationController::class, 'create'])->name('api.organization.create')->middleware('auth:api');
 
+
+//Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+//Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');

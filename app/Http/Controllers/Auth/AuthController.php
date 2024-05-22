@@ -27,10 +27,13 @@ class AuthController extends Controller
             // Send verification email
             //$user->sendEmailVerificationNotification(); 
            //$user->makeHidden(['created_at', 'updated_at'])
-           
-           return response()->json(['message' => "Emial sent"], 201);
+           if ($user) {
+            return response()->json(['message' => $user], 201);
+           }else{
+            return response()->json(['error' => "User could not been created"], 500);
+           }
+          
         } catch (\Exception $e) {
-            $user->delete();
             // Log the error internally
             \Log::error($e);
             // Return a JSON response with the error message and a 500 status code
