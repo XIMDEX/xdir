@@ -23,9 +23,14 @@ class AuthController extends Controller
     {
         try {
            $user = $this->userService->createUser($request->validated());
-           $user->makeHidden(['created_at', 'updated_at']);
-           return response()->json(['user' => $user], 201);
+
+            // Send verification email
+            //$user->sendEmailVerificationNotification(); 
+           //$user->makeHidden(['created_at', 'updated_at'])
+           
+           return response()->json(['message' => "Emial sent"], 201);
         } catch (\Exception $e) {
+            $user->delete();
             // Log the error internally
             \Log::error($e);
             // Return a JSON response with the error message and a 500 status code
@@ -38,7 +43,7 @@ class AuthController extends Controller
         try {
             $user = $this->userService->getUser($request->only('email', 'password'));
             if($user){
-                $user->makeHidden(['created_at', 'updated_at','uuid']);
+                $user->makeHidden(['created_at', 'updated_at']);
                 return response()->json(['user' => $user], 201);
             }
             return response()->json(['error' => 'User not found'], 404);

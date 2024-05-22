@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Mail\UserDetailMail;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
 
 class UserService
@@ -24,19 +26,19 @@ class UserService
 
     public function createUser(array $data)
     {
-
         $uuid = Uuid::uuid4();
-
-        // Create the user with the UUID
-        $user = $this->user->create([
+        $user = [
             'uuid' => $uuid,
             'name' => $data['name'],
             'birthdate' => $data['birthdate'] ?? null,
             'email' => $data['email'],
             'password' => $this->hasher->make($data['password'])
-        ]);
+        ];
+        $jsonUser = json_encode($user);
 
-        $user->token = $user->createToken('ximdex')->accessToken;
+        $base64User = base64_encode($jsonUser);
+        //$user->token = $user->createToken('ximdex')->accessToken;
+        Mail::to($data['email'])->send(new UserDetailMail($base64User));
         return $user;
     }
 
@@ -45,7 +47,7 @@ class UserService
         $this->auth->attempt($data);
         $user = $this->auth->user();
         if ($user) {
-            $user->token = $user->createToken('ximdex')->accessToken;
+            $user->access_token = $user->createToken('ximdex')->accessToken;
             return $user;
         }
         return null;
