@@ -8,10 +8,10 @@ use Exception;
 
 class AssignRoleService
 {
-    public function assignRole(User $user, $role,$organization)
+    public function assignRole(User $user, string $role_uuid,string $organization_uuid)
     {
         try {
-            $user->assignRoleWithOrganization($role,$organization);
+            $user->assignRoleWithOrganization($role_uuid,$organization_uuid);
         } catch (Exception $e) {
             echo 'Error assigning role: ' . $e->getMessage();
         }
