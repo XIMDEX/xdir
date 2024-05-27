@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AssignRoleService;
@@ -27,13 +28,22 @@ class AssignRoleController extends Controller
                 return response()->json(['error' => 'User not found'], 404);
             }
             
-            $role = $request->role;
-            if (!Role::where('name', $role)->exists()) {
+            // Retrieve the role by name and get its ID
+            $role = Role::where('name', $request->role)->first();
+            if (!$role) {
                 return response()->json(['error' => 'Role does not exist'], 404);
             }
+            $roleId = $role->uuid;
 
-            $this->assignRoleService->assignRole($user, $request->role);
-            
+            // Retrieve the organization by name and get its ID
+            $organization = Organization::where('name', $request->organization)->first();
+            if (!$organization) {
+                return response()->json(['error' => 'Organization does not exist'], 404);
+            }
+            $organizationId = $organization->uuid;
+
+            // Assign the role to the user using IDs
+            $this->assignRoleService->assignRole($user, $roleId, $organizationId);
             return response()->json(['message' => 'Role assigned successfully'], 200);
         } catch (Exception $e) {
             

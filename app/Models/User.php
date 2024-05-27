@@ -63,4 +63,21 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Organization::class, 'organization_user', 'user_uuid', 'organization_uuid');
     }
+
+    public function hasRoleInOrganization($role, $organizationId) {
+        return $this->roles()->where('name', $role)->wherePivot('organization_id', $organizationId)->exists();
+    }
+
+    /**
+     * Assign a role to the user within a specific organization.
+     *
+     * @param mixed $role
+     * @param int $organizationId
+     * @return $this
+     */
+    public function assignRoleWithOrganization($role, $organizationId)
+    {
+        $this->roles()->attach($role, ['organization_id' => $organizationId]);
+        return $this;
+    }
 }
