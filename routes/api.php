@@ -36,7 +36,7 @@ Route::post('/role/assign/permission', [AssignRoleController::class, 'addPermiss
 Route::post('/role/unassign/permission', [AssignRoleController::class, 'revokePermissionFromRole'])->name('api.roles.remove.permission')->middleware('auth:api');
 
 Route::post('/organization/create', [OrganizationController::class, 'create'])->name('api.organization.create')->middleware('auth:api');
-
+Route::post('/organization/update/{organization}',[OrganizationController::class,'update'])->name('api.organization.update')->middleware('auth:api');
 
 //Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 //Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
