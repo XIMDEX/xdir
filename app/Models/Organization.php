@@ -19,6 +19,10 @@ class Organization extends Model
         'uuid', 'name'
     ];
 
+    protected $hidden = [
+        'created_at','updated_at'
+    ];
+
     /**
      * The users that belong to the organization.
      */

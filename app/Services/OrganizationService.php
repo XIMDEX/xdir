@@ -87,4 +87,8 @@ class OrganizationService
             ];
         }
     }
+    
+    public function getAllOrganizations(){
+        return Organization::all();
+    }
 }

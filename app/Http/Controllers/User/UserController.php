@@ -19,7 +19,6 @@ class UserController extends Controller
 
     public function listUsers()
     {
-
         try {
             $users = $this->userService->getAllUsers(); 
             $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 

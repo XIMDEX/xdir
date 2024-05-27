@@ -65,4 +65,15 @@ class OrganizationController extends Controller
             return response()->json(['error' => 'An error occurred while deleting the organization'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function listOrganizations()
+    {
+        try {
+            $organizations = $this->organizationService->getAllOrganizations();
+            return response()->json($organizations, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            \Log::error('Error listing organizations: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while listing organizations'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
