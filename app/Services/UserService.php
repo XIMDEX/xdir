@@ -33,6 +33,7 @@ class UserService
             $user = [
                 'uuid' => $uuid,
                 'name' => $data['name'],
+                'surname'=> $data['surname'],
                 'birthdate' => $data['birthdate'] ?? null,
                 'email' => $data['email'],
                 'password' => $this->hasher->make($data['password'])
@@ -57,12 +58,9 @@ class UserService
     }
 
     public function registerUser($data){
-       /* if (!is_array($data)) {
-            throw new \Exception("Invalid user data");
-        }*/
         $user = $this->user->create(get_object_vars($data));
+        $user->markEmailAsVerified();
         $user->access_token = $user->createToken('ximdex')->accessToken;
-
         return $user;
     }
 
@@ -72,6 +70,7 @@ class UserService
         $user = $this->auth->user();
         if ($user) {
             $user->access_token = $user->createToken('ximdex')->accessToken;
+            $user->roles = $user->roles();
             return $user;
         }
         return null;
@@ -103,7 +102,7 @@ class UserService
 
             // Save the updated user
             $user->save();
-
+            $user->sendEmailVerificationNotification();
             // Generate a new access token for the user
             $user->token = $user->createToken(env('PASSPORT_TOKEN_NAME'))->accessToken;
 
