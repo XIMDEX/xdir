@@ -23,7 +23,7 @@ class AssingRoleToUserRequest extends FormRequest
     {
         return [
             'user_uuid' => 'required|exists:users,uuid',
-            'role_uuid' => 'required|string|exists:roles,uuid',
+            'role_uuid' => 'required|array|exists:roles,uuid',
             'organization_uuid' => 'required|string|exists:organizations,uuid',
         ];
     }

@@ -8,7 +8,7 @@ use Exception;
 
 class AssignRoleService
 {
-    public function assignRole(User $user, string $role_uuid,string $organization_uuid)
+    public function assignRole(User $user, $role_uuid,string $organization_uuid)
     {
         try {
             $user->assignRoleWithOrganization($role_uuid,$organization_uuid);

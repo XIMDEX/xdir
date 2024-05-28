@@ -15,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens,HasFactory, Notifiable, HasRoles,HasUuids;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasUuids;
     protected $primaryKey = 'uuid';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -57,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-     /**
+    /**
      * The organizations that the user belongs to.
      */
     public function organizations(): BelongsToMany
@@ -65,9 +65,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Organization::class, 'organization_user', 'user_uuid', 'organization_uuid');
     }
 
-    public function hasRoleInOrganization($role, $organizationId) {
+    public function hasRoleInOrganization($role, $organizationId)
+    {
         return $this->roles()->where('name', $role)->wherePivot('organization_id', $organizationId)->exists();
     }
+
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_uuid', 'role_id')
+            ->withPivot('organization_id')
+            ->select('organization_id', 'role_id', 'name');
+    }
+
+
 
     /**
      * Assign a role to the user within a specific organization.
@@ -76,9 +87,41 @@ class User extends Authenticatable implements MustVerifyEmail
      * @param int $organizationId
      * @return $this
      */
-    public function assignRoleWithOrganization($role, $organizationId)
+    public function assignRoleWithOrganization($roles, $organizationId)
     {
-        $this->roles()->attach($role, ['organization_id' => $organizationId]);
+        try {
+            foreach ($roles as $role) {
+                // Check if the role with the given organization_id already exists
+                $exists = $this->roles()
+                    ->wherePivot('organization_id', $organizationId)
+                    ->where('role_id', $role)
+                    ->exists();
+
+                // Attach the role if it doesn't exist
+                if (!$exists) {
+                    $this->roles()->attach($role, [
+                        'organization_id' => $organizationId,
+                        'model_type' => get_class($this)
+                    ]);
+                }
+            }
+            // Detach roles that are not in the provided array of roles
+            $rolesToDetach = $this->roles()
+                ->wherePivot('organization_id', $organizationId)
+                ->whereNotIn('role_id', $roles)
+                ->get();
+
+            foreach ($rolesToDetach as $role) {
+                $this->roles()->detach($role->role_id, [
+                    'organization_id' => $organizationId,
+                    'model_type' => get_class($this)
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Handle the exception (log it, rethrow it, or return a custom error message)
+            \Log::error('Error attaching roles: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to assign roles'], 500);
+        }
         return $this;
     }
 }

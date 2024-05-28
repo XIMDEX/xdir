@@ -49,7 +49,7 @@ class AuthController extends Controller
                 $user->makeHidden(['created_at', 'updated_at']);
                 return response()->json(['user' => $user], 201);
             }
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => 'Login failed'], 404);
         } catch (\Exception $e) {
              // Handle general errors
             \Log::error($e->getMessage());
