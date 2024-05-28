@@ -2,14 +2,13 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationInviteController;
 use App\Http\Controllers\Permissions\PermissionController;
 use App\Http\Controllers\Roles\AssignRoleController;
 use App\Http\Controllers\Roles\RoleController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\UserUpdateController;
 use App\Http\Controllers\verification\VerificationController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -39,6 +38,7 @@ Route::post('/organization/create', [OrganizationController::class, 'create'])->
 Route::post('/organization/update/{organization}',[OrganizationController::class,'update'])->name('api.organization.update')->middleware('auth:api');
 //Route::post( '/organization/delete/{organization}', [OrganizationController::class, 'delete'])->name('api.organization.delete')->middleware('auth:api');
 Route::get('/organizations', [OrganizationController::class, 'listOrganizations'])->name('api.organizations.list')->middleware('auth:api');
+Route::post('organization/invite/{organization}/{email}',[OrganizationInviteController::class,'sendInvite'])->name('api.organization.invite')->middleware('auth:api');
 
 //Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 //Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');

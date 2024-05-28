@@ -20,14 +20,7 @@ class UserController extends Controller
     public function listUsers()
     {
         try {
-            $users = $this->userService->getAllUsers()->load('roles'); 
-            $users->each(function ($user) {
-                $user->roles->each(function ($role) use ($user) {
-                    
-                    $role->organization_id = $role->pivot->organization_id;
-                    $role->makeHidden('pivot');
-                });
-            });
+            $users = $this->userService->getAllUsers(); 
             $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
             return response()->json(['users' => $users]);
         } catch (\Exception $e) {
