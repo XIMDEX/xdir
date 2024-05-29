@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
@@ -23,21 +24,17 @@ class AuthController extends Controller
     {
         try {
            $user = $this->userService->createUser($request->validated());
-
-            // Send verification email
-            //$user->sendEmailVerificationNotification(); 
-           //$user->makeHidden(['created_at', 'updated_at'])
            if ($user) {
-            return response()->json(['message' => $user], 201);
+            return response()->json(['message' => $user], Response::HTTP_CREATED);
            }else{
-            return response()->json(['error' => "User could not been created"], 500);
+            return response()->json(['error' => "User could not been created"], Response::HTTP_INTERNAL_SERVER_ERROR);
            }
           
         } catch (\Exception $e) {
             // Log the error internally
             \Log::error($e);
             // Return a JSON response with the error message and a 500 status code
-            return response()->json(['error' => 'An error occurred while registering the user. Please try again later.' . $e], 500);
+            return response()->json(['error' => 'An error occurred while registering the user. Please try again later.' . $e], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -47,13 +44,13 @@ class AuthController extends Controller
             $user = $this->userService->getUser($request->only('email', 'password'));
             if($user){
                 $user->makeHidden(['created_at', 'updated_at']);
-                return response()->json(['user' => $user], 201);
+                return response()->json(['user' => $user], Response::HTTP_CREATED);
             }
-            return response()->json(['error' => 'Login failed'], 404);
+            return response()->json(['error' => 'Login failed'], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
              // Handle general errors
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'Server error occurred. Please try again later.'], 500);
+            return response()->json(['error' => 'Server error occurred. Please try again later.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         
     }
@@ -78,7 +75,7 @@ class AuthController extends Controller
        if ($user) {
            return response()->json(['message' => 'Token is valid', 'user' => $user]);
        } else {
-           return response()->json(['message' => 'Token is invalid'], 401);
+           return response()->json(['message' => 'Token is invalid'], Response::HTTP_UNAUTHORIZED);
        }
    }
 }
