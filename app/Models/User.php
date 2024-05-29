@@ -124,4 +124,12 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         return $this;
     }
+
+    public function getAdditionalInformation()
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+    }
 }

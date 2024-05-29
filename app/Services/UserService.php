@@ -25,42 +25,45 @@ class UserService
         $this->user = $user;
     }
 
-    public function createUser(array $data)
+    /**
+     * Creates a new user and sends an email with their details
+     *
+     * @param array $userData
+     * @return string|false
+     */
+    public function createUser(array $userData)
     {
         try {
-            // Generate UUID and create user data array
-            $uuid = Uuid::uuid4();
+            $userId = Uuid::uuid4();
             $user = [
-                'uuid' => $uuid,
-                'name' => $data['name'],
-                'surname'=> $data['surname'],
-                'birthdate' => $data['birthdate'] ?? null,
-                'email' => $data['email'],
-                'password' => $this->hasher->make($data['password'])
+                'uuid' => $userId,
+                'name' => $userData['name'],
+                'surname' => $userData['surname'],
+                'birthdate' => $userData['birthdate'] ?? null,
+                'email' => $userData['email'],
+                'password' => $this->hasher->make($userData['password']),
+                'organization_id' => array_key_exists('organization', $userData) ? $userData['organization'] : null,
             ];
-    
-            // Convert user data to JSON and then to Base64
+
             $jsonUser = json_encode($user);
             $base64User = base64_encode($jsonUser);
-    
-            // Send email
-           
-            Mail::to($data['email'])->send(new UserDetailMail($base64User));
-            // Return true if everything went well
+
+            Mail::to($userData['email'])->send(new UserDetailMail($base64User));
+
             return $base64User;
         } catch (Exception $e) {
-            // Log the error
-            \Log::error("Failed to create user and send email: " . $e->getMessage());
-    
-            // Return false if there was an error
             return false;
         }
     }
+
 
     public function registerUser($data){
         $user = $this->user->create(get_object_vars($data));
         $user->markEmailAsVerified();
         $user->access_token = $user->createToken('ximdex')->accessToken;
+        if (isset($data->organization_id)) {
+            $user->organizations()->attach($data->organization_id);
+        }
         return $user;
     }
 
@@ -147,5 +150,10 @@ class UserService
     public function getAllUsers()
     {
         return User::all();
+    }
+
+    public function addUserToOrganization($user, $organization)
+    {
+        $user->organizations()->attach($organization->id);
     }
 }

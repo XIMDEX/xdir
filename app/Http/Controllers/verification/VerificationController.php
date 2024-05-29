@@ -40,23 +40,7 @@ class VerificationController extends Controller
     public function verify(string $code)
     {
         $this->userService->registerUser(json_decode(base64_decode($code)));
-
-        /*$userID = $request['id'];
-        $user = \App\Models\User::findOrFail($userID);
-
-        $hash = $request['hash'];
-
-        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(["message" => "Invalid verification link"], 401);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(["message" => "Email already verified."], 400);
-        }
-
-        if ($user->markEmailAsVerified()) {
-            event(new Verified($user));
-        }*/
+        
 
         return response()->json(["message" => "Email has been verified."], 200);
     }
