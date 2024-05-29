@@ -70,7 +70,19 @@ class UserService
         $user = $this->auth->user();
         if ($user) {
             $user->access_token = $user->createToken('ximdex')->accessToken;
-            $user->roles = $user->roles();
+            if ($user->roles()->exists()){
+                $rolesGroupedByOrganization = $user->roles()->get()->makeHidden('pivot')
+                ->groupBy('organization_id')
+                ->map(function ($roles) {
+                    return $roles->map(function ($role) {  
+                        return $role->only('role_id', 'name'); 
+                    });
+                });
+    
+            
+                $user->roles = $rolesGroupedByOrganization;
+            }
+           
             return $user;
         }
         return null;
