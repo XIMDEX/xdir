@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Contracts\Hashing\Hasher;
 use Ramsey\Uuid\Uuid;
 
-class UserCreationService
+class UserPrepareService
 {
     protected $hasher;
     protected $mailService;
@@ -24,7 +24,7 @@ class UserCreationService
         try {
             $user = $this->buildUserArray($userData);
             $encodedUser = $this->encodeUser($user);
-            $this->sendUserDetailsEmail($userData['email'], $encodedUser);
+            $this->mailService->sendUserDetails($userData['email'], $encodedUser);
             return $encodedUser;
         } catch (Exception $e) {
             \Log::error($e->getMessage());
