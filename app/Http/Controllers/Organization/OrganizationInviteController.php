@@ -10,24 +10,30 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrganizationInviteController extends Controller
 {
     public function sendInvite(SendInviteRequest $request)
        {
-           $email = $request->route('email');
-           $organization = Organization::where('uuid', $request->route('organization'))->firstOrFail();
-           $inviteLink = "organization={$organization->uuid}&email=$email";
+           try {
+               $email = $request->route('email');
+               $organization = Organization::where('uuid', $request->route('organization'))->firstOrFail();
+               $inviteLink = "organization={$organization->uuid}&email=$email";
 
-           Invitation::create([
-            'uuid' => Uuid::uuid4(),
-            'email' => $email,
-            'organization_id' => $organization->uuid,
-            'status' => 'pending'
-            ]);
+               Invitation::create([
+                'uuid' => Uuid::uuid4(),
+                'email' => $email,
+                'organization_id' => $organization->uuid,
+                'status' => 'pending'
+                ]);
 
-           Mail::to($email)->send(new OrganizationInviteMail($organization->name, $inviteLink));
+               Mail::to($email)->send(new OrganizationInviteMail($organization->name, $inviteLink));
 
-           return response()->json(['message' => 'Invitation sent successfully!']);
+               return response()->json(['message' => 'Invitation sent successfully!'], Response::HTTP_OK);
+           } catch (\Exception $e) {
+               \Log::error('Error sending invitation: ' . $e->getMessage());
+               return response()->json(['error' => 'An error occurred while sending the invitation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+           }
        }
 }
