@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserService
 {
@@ -69,26 +70,31 @@ class UserService
 
     public function getUser(array $data)
     {
-        $this->auth->attempt($data);
-        $user = $this->auth->user();
-        if ($user) {
-            $user->access_token = $user->createToken('ximdex')->accessToken;
-            if ($user->roles()->exists()){
-                $rolesGroupedByOrganization = $user->roles()->get()->makeHidden('pivot')
-                ->groupBy('organization_id')
-                ->map(function ($roles) {
-                    return $roles->map(function ($role) {  
-                        return $role->only('role_id', 'name'); 
+        try {
+            $this->auth->attempt($data);
+            $user = $this->auth->user();
+            if ($user) {
+                $user->access_token = $user->createToken('ximdex')->accessToken;
+                if ($user->roles()->exists()){
+                    $rolesGroupedByOrganization = $user->roles()->get()->makeHidden('pivot')
+                    ->groupBy('organization_id')
+                    ->map(function ($roles) {
+                        return $roles->map(function ($role) {  
+                            return $role->only('role_id', 'name'); 
+                        });
                     });
-                });
-    
-            
-                $user->roles = $rolesGroupedByOrganization;
+                
+                
+                    $user->roles = $rolesGroupedByOrganization;
+                }
+               
+                return $user;
             }
-           
-            return $user;
+            return null;
+        } catch (Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while retrieving user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
     public function updateUser(array $data)
@@ -107,6 +113,10 @@ class UserService
             if (isset($data['name'])) {
                 $user->name = $data['name'];
             }
+
+            if (isset($data['surname'])) {
+                $user->surname = $data['surname'];
+            }
             if (isset($data['password'])) {
                 $user->password = $this->hasher->make($data['password']);
             }
@@ -117,7 +127,7 @@ class UserService
 
             $user->save();
 
-            $user->token = $user->createToken(env('PASSPORT_TOKEN_NAME'))->accessToken;
+            $user->access_token = $user->createToken(env('PASSPORT_TOKEN_NAME'))->accessToken;
 
             return $user;
         } catch (\Exception $e) {
