@@ -17,7 +17,7 @@ class UserUpdateController extends Controller
         $this->userService = $userService;
     }
 
-    public function updateUser(Request $request)
+    public function update(Request $request)
     {
         try {
             $data = $request->all();

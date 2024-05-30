@@ -115,10 +115,8 @@ class UserService
                 $user->birthdate = $data['birthdate'];
             }
 
-            // Save the updated user
             $user->save();
-            $user->sendEmailVerificationNotification();
-            // Generate a new access token for the user
+
             $user->token = $user->createToken(env('PASSPORT_TOKEN_NAME'))->accessToken;
 
             return $user;
