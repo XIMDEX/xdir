@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\AssignRoleService;
 use Exception;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AssignRoleController extends Controller
 {
@@ -26,9 +27,9 @@ class AssignRoleController extends Controller
         try {
             $user = User::findOrFail($request->user_uuid);
             $this->assignRoleService->assignRole($user, $request->role_uuid, $request->organization_uuid, $request->tool_uuid);
-            return response()->json(['message' => 'Role assigned successfully'], 200);
+            return response()->json(['message' => 'Role assigned successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -37,9 +38,9 @@ class AssignRoleController extends Controller
         try {
             $user = User::findOrFail($request->user_uuid);
             $this->assignRoleService->revokeRole($user, $request->role_uuid);
-            return response()->json(['message' => 'Role unassigned successfully'], 200);
+            return response()->json(['message' => 'Role unassigned successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -49,14 +50,14 @@ class AssignRoleController extends Controller
             $role = Role::where('name', $request->role)->first();
 
             if (!$role) {
-                return response()->json(['error' => 'Role not found'], 404);
+                return response()->json(['error' => 'Role not found'], Response::HTTP_NOT_FOUND);
             }
 
             $this->assignRoleService->addPermissionToRole($role, $request->permission);
 
-            return response()->json(['message' => 'Permission added to role successfully'], 200);
+            return response()->json(['message' => 'Permission added to role successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -66,14 +67,14 @@ class AssignRoleController extends Controller
             $role = Role::where('name', $request->role)->first();
 
             if (!$role) {
-                return response()->json(['error' => 'Role not found'], 404);
+                return response()->json(['error' => 'Role not found'], Response::HTTP_NOT_FOUND);
             }
 
             $this->assignRoleService->removePermissionFromRole($role, $request->permission);
 
-            return response()->json(['message' => 'Permission revoked from role successfully'], 200);
+            return response()->json(['message' => 'Permission revoked from role successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
