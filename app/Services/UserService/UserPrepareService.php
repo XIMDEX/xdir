@@ -24,7 +24,7 @@ class UserPrepareService
         try {
             $user = $this->buildUserArray($userData);
             $encodedUser = $this->encodeUser($user);
-            $this->mailService->sendUserDetails($userData['email'], $encodedUser);
+            $this->mailService->sendUserDetails($userData['email'], env('APP_NAME') . '/' . $encodedUser);
             return $encodedUser;
         } catch (Exception $e) {
             \Log::error($e->getMessage());

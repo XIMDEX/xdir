@@ -12,4 +12,9 @@ class Role extends SpatieRole
     use HasUuids;
     protected $primaryKey = 'uuid';
 
+
+    public function tools()
+    {
+        return $this->belongsToMany(Tool::class, 'model_has_roles', 'role_id', 'tool_id');
+    }
 }
