@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class VerificationController extends Controller
 {
@@ -39,10 +40,15 @@ class VerificationController extends Controller
      */
     public function verify(string $code)
     {
-        $this->userService->registerUser(json_decode(base64_decode($code)));
-        
-
-        return response()->json(["message" => "Email has been verified."], 200);
+        try {
+            $this->userService->registerUser(json_decode(base64_decode($code)));
+            
+            return response()->json(["message" => "Email has been verified."], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Handle general errors
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'Server error occurred. Please try again later.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -55,11 +61,11 @@ class VerificationController extends Controller
     {
         $user = $request->user();
         if ($user->hasVerifiedEmail()) {
-            return response()->json(["message" => "Email already verified."], 400);
+            return response()->json(["message" => "Email already verified."], Response::HTTP_OK);
         }
 
         $user->sendEmailVerificationNotification();
 
-        return response()->json(["message" => "Verification link sent."], 200);
+        return response()->json(["message" => "Verification link sent."], Response::HTTP_OK);
     }
 }
