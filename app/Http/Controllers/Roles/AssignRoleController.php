@@ -25,7 +25,7 @@ class AssignRoleController extends Controller
     {
         try {
             $user = User::findOrFail($request->user_uuid);
-            $this->assignRoleService->assignRole($user, $request->role_uuid, $request->organization_uuid);
+            $this->assignRoleService->assignRole($user, $request->role_uuid, $request->organization_uuid, $request->tool_uuid);
             return response()->json(['message' => 'Role assigned successfully'], 200);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

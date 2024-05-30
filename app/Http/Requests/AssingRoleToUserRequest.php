@@ -25,6 +25,7 @@ class AssingRoleToUserRequest extends FormRequest
             'user_uuid' => 'required|exists:users,uuid',
             'role_uuid' => 'required|array|exists:roles,uuid',
             'organization_uuid' => 'required|string|exists:organizations,uuid',
+            'tool_uuid' => 'required|string|exists:tools,uuid',
         ];
     }
 }

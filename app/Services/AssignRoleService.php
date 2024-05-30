@@ -5,16 +5,31 @@ namespace App\Services;
 use App\Models\Role;
 use App\Models\User;
 use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 class AssignRoleService
 {
-    public function assignRole(User $user, $role_uuid,string $organization_uuid)
+    public function assignRole(User $user, $roles, string $organizationId, string $toolId)
     {
+        \DB::beginTransaction();
         try {
-            $user->assignRoleWithOrganization($role_uuid,$organization_uuid);
-        } catch (Exception $e) {
-            echo 'Error assigning role: ' . $e->getMessage();
+
+            $currentRoles = $this->getRolesForOrganization($user, $organizationId);
+
+            $rolesToAdd = array_diff($roles, $currentRoles);
+            $rolesToRemove = array_diff($currentRoles, $roles);
+
+
+            $this->addRoles($user, $rolesToAdd, $organizationId, $toolId);
+            $this->removeRoles($user, $rolesToRemove, $organizationId, $toolId);
+
+            \DB::commit();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Error synchronizing roles: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to assign roles'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        return $user;
     }
 
     public function revokeRole(User $user, $role)
@@ -54,5 +69,34 @@ class AssignRoleService
         }
     }
 
-    
+
+    private function getRolesForOrganization($user, $organizationId)
+    {
+        return $user->roles()
+            ->wherePivot('organization_id', $organizationId)
+            ->pluck('role_id')
+            ->toArray();
+    }
+
+    private function addRoles($user, $roles, $organizationId, $toolId)
+    {
+        foreach ($roles as $role) {
+            $user->roles()->attach($role, [
+                'organization_id' => $organizationId,
+                'model_type' => get_class($this),
+                'tool_id' => $toolId
+            ]);
+        }
+    }
+
+    private function removeRoles($user, $roles, $organizationId, $toolId)
+    {
+        if (!empty($roles)) {
+            $user->roles()->detach($roles, [
+                'organization_id' => $organizationId,
+                'model_type' => get_class($this),
+                'tool_id' => $toolId
+            ]);
+        }
+    }
 }
