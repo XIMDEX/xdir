@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\UserService;
+use App\Services\UserService\UserPrepareService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,14 +17,17 @@ class AuthController extends Controller
 
     protected $userService;
 
-    public function __construct(UserService $userService)
+    protected $userPrepareService;
+
+    public function __construct(UserService $userService,UserPrepareService $userPrepareService)
     {
       $this->userService = $userService;
+      $this->userPrepareService = $userPrepareService;
     }
     public function register(RegisterRequest $request)
     {
         try {
-           $user = $this->userService->createUser($request->validated());
+           $user = $this->userPrepareService->prepareUserRegistration($request->validated());
            if ($user) {
             return response()->json(['message' => $user], Response::HTTP_CREATED);
            }else{
