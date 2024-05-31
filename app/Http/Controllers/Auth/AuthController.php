@@ -19,6 +19,16 @@ class AuthController extends Controller
 
     protected $userPrepareService;
 
+
+    private $rolesBitwiseMap = [
+        'viewer' => '11100000',
+        'creator' => '11110000',
+        'editor' => '11111100',
+        'admin' => '00000010',
+        'superAdmin' => '00000001',
+    ];
+
+
     public function __construct(UserService $userService,UserPrepareService $userPrepareService)
     {
       $this->userService = $userService;
@@ -45,9 +55,9 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-            $user = $this->userService->getUser($request->only('email', 'password'));
+            $user = $this->userService->getUserByLogin($request->only('email', 'password'));
             if($user){
-                $user->makeHidden(['created_at', 'updated_at']);
+                $user->makeHidden(['created_at', 'updated_at','roles']);
                 return response()->json(['user' => $user], Response::HTTP_CREATED);
             }
             return response()->json(['error' => 'Login failed'], Response::HTTP_NOT_FOUND);

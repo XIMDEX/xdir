@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 
 // Permission Routes
-Route::middleware('auth:api')->group(function () {
-    Route::post('/permissions', [PermissionController::class, 'create'])->name('api.permissions.create');
-    Route::put('/permissions/{permissionId}', [PermissionController::class, 'update'])->name('api.permissions.update');
-    Route::delete('/permissions/{permissionId}', [PermissionController::class, 'delete'])->name('api.permissions.delete');
-    Route::get('/permissions', [PermissionController::class, 'getList'])->name('api.permissions.list');
+Route::prefix('permissions')->middleware('auth:api')->group(function () {
+    Route::post('/', [PermissionController::class, 'create'])->name('api.permissions.create');
+    Route::put('/{permissionId}', [PermissionController::class, 'update'])->name('api.permissions.update');
+    Route::delete('/{permissionId}', [PermissionController::class, 'delete'])->name('api.permissions.delete');
+    Route::get('/', [PermissionController::class, 'getList'])->name('api.permissions.list');
 });

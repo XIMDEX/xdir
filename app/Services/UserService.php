@@ -18,12 +18,20 @@ class UserService
     protected $hasher;
     protected $uuid;
     protected $user;
+    private $rolesBitwiseMap = [
+        'viewer' => '11100000',
+        'creator' => '11110000',
+        'editor' => '11111100',
+        'admin' => '00000010',
+        'superAdmin' => '00000001',
+    ];
 
     public function __construct(Guard $auth, Hasher $hasher, User $user)
     {
         $this->auth = $auth;
         $this->hasher = $hasher;
         $this->user = $user;
+        
     }
 
     /**
@@ -58,7 +66,8 @@ class UserService
     }
 
 
-    public function registerUser($data){
+    public function registerUser($data)
+    {
         $user = $this->user->create(get_object_vars($data));
         $user->markEmailAsVerified();
         $user->access_token = $user->createToken('ximdex')->accessToken;
@@ -68,32 +77,37 @@ class UserService
         return $user;
     }
 
-    public function getUser(array $data)
+    public function getUserByLogin(array $data)
     {
         try {
             $this->auth->attempt($data);
             $user = $this->auth->user();
             if ($user) {
                 $user->access_token = $user->createToken('ximdex')->accessToken;
-                if ($user->roles()->exists()){
-                    $rolesGroupedByOrganization = $user->roles()->get()->makeHidden('pivot')
-                    ->groupBy('organization_id')
-                    ->map(function ($roles) {
-                        return $roles->map(function ($role) {  
-                            return $role->only('role_id', 'name'); 
-                        });
-                    });
-                
-                
-                    $user->roles = $rolesGroupedByOrganization;
-                }
-               
+                $user->p = $this->getUserToolRoles($user);
                 return $user;
             }
             return null;
         } catch (Exception $e) {
             \Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred while retrieving user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Get user by id.
+     *
+     * @param string $id User id
+     * @return User|null
+     */
+    public function getUserById(string $id)
+    {
+        try {
+            $user = $this->user->findOrFail($id);
+            $user->p = $this->getUserToolRoles($user);
+            return $user;
+        } catch (Exception $e) {
+            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -105,11 +119,8 @@ class UserService
 
             if (isset($data['email']) && $this->checkEmail($data, $user->email)) {
                 $user->email = $data['email'];
-            } elseif (isset($data['email'])) {
-                return response()->json(['error' => 'Email already in use'], 409);
-            }
+            } 
 
-            // Update other user properties if they are included in the update request
             if (isset($data['name'])) {
                 $user->name = $data['name'];
             }
@@ -132,8 +143,22 @@ class UserService
             return $user;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred while updating user'], 500);
+            return response()->json(['error' => 'An error occurred while updating user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function deleteUser($id)
+    {
+        //add try and catch
+        try {
+            $user = $this->user->find($id);
+            $user->delete();
+            return $user;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while deleting user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+     
     }
 
     protected function checkEmail(array $data, string $email)
@@ -163,5 +188,21 @@ class UserService
     public function addUserToOrganization($user, $organization)
     {
         $user->organizations()->attach($organization->id);
+    }
+
+
+    private function getUserToolRoles($user) {
+        if ($user->roles()->exists()) {
+            $userToolRoles = [];
+            $roles = $user->roles->load('tools');
+            foreach ($roles as $role) {
+                $userToolRoles[$role->tools->first()->hash] = [
+                    'organization' => $role->pivot->organization_id,
+                    'permission' => $this->rolesBitwiseMap[$role->name]
+                ];
+            }
+            return $userToolRoles;
+        }
+        return null;
     }
 }

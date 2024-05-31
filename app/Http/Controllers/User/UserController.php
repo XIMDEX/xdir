@@ -28,4 +28,28 @@ class UserController extends Controller
             return response()->json(['error' => 'An error occurred while fetching the user list.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getUser(Request $request)
+    {
+        try {
+            $user = $this->userService->getUserByLogin($request->only('email', 'password')); 
+            $user->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
+            return response()->json(['user' => $user]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function deleteUser(Request $request)
+    {
+        try {
+            $user = $this->userService->deleteUser($request->user_id); 
+            return response()->json(['message' => 'User deleted successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Route;
 
 
 // User Routes
-Route::middleware('auth:api')->group(function () {
-    Route::put('/user/update', [UserUpdateController::class, 'update'])->name('api.user.update');
-    Route::get('/users', [UserController::class, 'listUsers'])->name('api.users.list');
+Route::group(['middleware' => 'auth:api', 'prefix' => 'users'], function () {
+    Route::put('/{id}', [UserUpdateController::class, 'update'])->name('api.users.update');
+    Route::get('/{id}', [UserController::class, 'getUser'])->name('api.users.get');
+    Route::get('/', [UserController::class, 'listUsers'])->name('api.users.list');
+    Route::delete('/{id}', [UserController::class, 'deleteUser'])->name('api.users.delete');
 });

@@ -49,9 +49,4 @@ class UserPrepareService
     {
         return base64_encode(json_encode($user));
     }
-
-    protected function sendUserDetailsEmail(string $email, string $encodedUser): void
-    {
-        Mail::to($email)->send(new UserDetailMail($encodedUser));
-    }
 }
