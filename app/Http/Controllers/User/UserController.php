@@ -41,10 +41,10 @@ class UserController extends Controller
         }
     }
 
-    public function deleteUser(Request $request)
+    public function deleteUser($id)
     {
         try {
-            $user = $this->userService->deleteUser($request->user_id); 
+            $user = $this->userService->deleteUser($id); 
             return response()->json(['message' => 'User deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

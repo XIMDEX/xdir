@@ -149,7 +149,6 @@ class UserService
 
     public function deleteUser($id)
     {
-        //add try and catch
         try {
             $user = $this->user->find($id);
             $user->delete();
