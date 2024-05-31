@@ -14,15 +14,13 @@ class MailService
     protected $userDetailMail;
 
     // Inject the Mailer contract (interface) into the service.
-    public function __construct(Mailer $mailer,UserDetailMailInterface $userDetailMail)
+    public function __construct(Mailer $mailer)
     {
         $this->mailer = $mailer;
-        $this->userDetailMail = $userDetailMail;
     }
 
     public function sendUserDetails($email, $encodedUser)
     {
-        $mailable = $this->userDetailMail->create($encodedUser);
-        $this->mailer->to($email)->send($mailable);
+        $this->mailer->to($email)->send(new UserDetailMail($encodedUser));
     }
 }
