@@ -10,3 +10,4 @@
    require __DIR__ . '/permission.php';
    require __DIR__ . '/role.php';
    require __DIR__ . '/organization.php';
+   require __DIR__ . '/tool.php';
