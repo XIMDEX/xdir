@@ -15,4 +15,8 @@ class Invitation extends Model
         'organization_id',
         'status',
     ];
+
+    protected $hidden = [
+        'created_at','updated_at'
+    ];
 }

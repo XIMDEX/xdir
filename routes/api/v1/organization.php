@@ -12,5 +12,5 @@ Route::prefix('organizations')->middleware('auth:api')->group(function () {
     Route::delete('/{organization}', [OrganizationController::class, 'destroy'])->name('api.organizations.delete');
     Route::get('/', [OrganizationController::class, 'listOrganizations'])->name('api.organizations.list');
     Route::post('/{organization}/invite/{email}', [OrganizationInviteController::class, 'sendInvite'])->name('api.organizations.invite');
-    Route::get('/invitations', [OrganizationInviteController::class, 'listInvites'])->name('api.organizations.invites.list');
+    Route::get('/invitations', [OrganizationInviteController::class, 'invitationList'])->name('api.organizations.invites.list');
 });
