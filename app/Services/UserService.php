@@ -22,8 +22,8 @@ class UserService
         'viewer' => '11100000',
         'creator' => '11110000',
         'editor' => '11111100',
-        'admin' => '00000010',
-        'superAdmin' => '00000001',
+        'admin' => '11111110',
+        'superAdmin' => '11111111',
     ];
 
     public function __construct(Guard $auth, Hasher $hasher, User $user)
