@@ -18,9 +18,9 @@ class InvitationService
             $inviteLink = "organization={$organization->uuid}&email=$email";
 
             Invitation::create([
-                'uuid' => Str::uuid(), // Assuming you have 'use Illuminate\Support\Str;'
+                'uuid' => Str::uuid(), 
                 'email' => $email,
-                'organization_id' => $organization->id, // Assuming it should be 'id' not 'uuid'
+                'organization_id' => $organization->uuid, 
                 'status' => 'pending'
             ]);
 
