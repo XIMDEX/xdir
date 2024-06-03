@@ -179,9 +179,18 @@ class UserService
         return false;
     }
 
-    public function getAllUsers()
+    public function getAllUsers($page = 1)
     {
-        return User::all();
+        $paginationResult = User::paginate(20, ['*'], 'page', $page);
+        
+        $customResult = [
+            'total'        => $paginationResult->total(),
+            'to'           => $paginationResult->lastItem(),
+            'current_page' => $paginationResult->currentPage(),
+            'data'         => $paginationResult->items(),
+        ];
+
+        return $customResult;
     }
 
     public function addUserToOrganization($user, $organization)

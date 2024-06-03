@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserPaginationRequest;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -17,11 +18,13 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function listUsers()
+    public function listUsers(UserPaginationRequest $request)
     {
         try {
-            $users = $this->userService->getAllUsers(); 
-            $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
+            $page = $request->query('page', 1);
+            $users = $this->userService->getAllUsers($page); 
+           
+           // $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
             return response()->json(['users' => $users]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
