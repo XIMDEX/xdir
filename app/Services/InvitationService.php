@@ -11,20 +11,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InvitationService
 {
-    public function sendInvitation($email, $organizationUuid)
+    public function sendInvitation($email, $organizationUuid,$organizationName)
     {
         try {
-            $organization = Organization::where('uuid', $organizationUuid)->firstOrFail();
-            $inviteLink = "organization={$organization->uuid}&email=$email";
+            $inviteLink = "organization={$organizationUuid}&email=$email";
 
             Invitation::create([
                 'uuid' => Str::uuid(), 
                 'email' => $email,
-                'organization_id' => $organization->uuid, 
+                'organization_id' => $organizationUuid, 
                 'status' => 'pending'
             ]);
 
-            Mail::to($email)->send(new OrganizationInviteMail($organization->name, $inviteLink));
+            Mail::to($email)->send(new OrganizationInviteMail($organizationName, $inviteLink));
 
             return ['message' => 'Invitation sent successfully!', 'status' => Response::HTTP_OK];
         } catch (\Exception $e) {

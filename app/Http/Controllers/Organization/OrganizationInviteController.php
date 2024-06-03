@@ -23,13 +23,12 @@ class OrganizationInviteController extends Controller
         $this->invitationService = $invitationService;
     }
     
-    public function sendInvite(SendInviteRequest $request)
+    public function sendInvite(SendInviteRequest $request, Organization $organization)
        {
            try {
             $email = $request->route('email');
-            $organizationUuid = $request->route('organization');
             
-            $result = $this->invitationService->sendInvitation($email, $organizationUuid);
+            $result = $this->invitationService->sendInvitation($email, $organization->uuid,$organization->name);
     
             return response()->json($result, $result['status']);
            } catch (\Exception $e) {
