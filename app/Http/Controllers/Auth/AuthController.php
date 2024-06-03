@@ -45,9 +45,7 @@ class AuthController extends Controller
            }
           
         } catch (\Exception $e) {
-            // Log the error internally
             \Log::error($e);
-            // Return a JSON response with the error message and a 500 status code
             return response()->json(['error' => 'An error occurred while registering the user. Please try again later.' . $e], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -62,7 +60,6 @@ class AuthController extends Controller
             }
             return response()->json(['error' => 'Login failed'], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
-             // Handle general errors
             \Log::error($e->getMessage());
             return response()->json(['error' => 'Server error occurred. Please try again later.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -82,7 +79,7 @@ class AuthController extends Controller
         return response()->json(['user' => $updatedUser]);
     }
 
-    public function validateToken(Request $request)
+    public function validateToken()
    {
        $user = Auth::guard('api')->user();
        

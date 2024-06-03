@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\verification;
 
 use App\Http\Controllers\Controller;
+use App\Models\Invitation;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\VerifiesEmails;
@@ -41,8 +42,15 @@ class VerificationController extends Controller
     public function verify(string $code)
     {
         try {
-            $this->userService->registerUser(json_decode(base64_decode($code)));
-            
+            $user = $this->userService->registerUser(json_decode(base64_decode($code)));
+            if($user->organizations()->count() > 0) {
+                $invitation = Invitation::where('email', $user->email)->first();
+                if(!$invitation) {
+                    return response()->json(['error' => 'Invitation not found.'], Response::HTTP_NOT_FOUND);
+                }
+                $invitation->status = 'completed';
+                $invitation->save();
+            }
             return response()->json(["message" => "Email has been verified."], Response::HTTP_OK);
         } catch (\Exception $e) {
             // Handle general errors
