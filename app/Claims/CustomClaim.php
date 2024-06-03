@@ -18,12 +18,12 @@ class CustomClaim
             'creator' => '11110000',
             'editor' => '11111100',
             'admin' => '11111110',
-            'superAdmin' => '11111111',
+            'superadmin' => '11111111',
         ];
         $toolsPermissions = [];
 
         foreach ($user->roles as $role) {
-            $permission = $rolesBitwiseMap[$role->name] ?? null; // Get the permission from the rolesBitwiseMap
+            $permission = $rolesBitwiseMap[strtolower($role->name)] ?? null; // Get the permission from the rolesBitwiseMap
             foreach ($role->tools as $tool) {
                 $toolHash = $tool->hash; // Get the hash from the tool
                 // Construct the organization#permission string

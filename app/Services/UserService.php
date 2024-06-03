@@ -23,7 +23,7 @@ class UserService
         'creator' => '11110000',
         'editor' => '11111100',
         'admin' => '11111110',
-        'superAdmin' => '11111111',
+        'superadmin' => '11111111',
     ];
 
     public function __construct(Guard $auth, Hasher $hasher, User $user)
@@ -206,7 +206,7 @@ class UserService
             foreach ($roles as $role) {
                 $userToolRoles[$role->tools->first()->hash] = [
                     'organization' => $role->pivot->organization_id,
-                    'permission' => $this->rolesBitwiseMap[$role->name]
+                    'permission' => $this->rolesBitwiseMap[strtolower($role->name)]
                 ];
             }
             return $userToolRoles;
