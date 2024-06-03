@@ -18,7 +18,6 @@ class SendInviteRequest extends FormRequest
     {
         return [
             'email' => 'required|email|unique:users,email|unique:invitations,email',
-            'organization' => 'required|exists:organizations,uuid'
         ];
     }
 
@@ -27,7 +26,6 @@ class SendInviteRequest extends FormRequest
         // Merge URL parameters into the request data
         $this->merge([
             'email' => $this->route('email'),
-            'organization' => $this->route('organization')
         ]);
     }
 }
