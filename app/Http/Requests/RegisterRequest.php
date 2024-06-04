@@ -27,6 +27,7 @@ class RegisterRequest extends FormRequest
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'birthdate' => 'required|date',
+            'organization_id' => 'sometimes|nullable|exists:organizations,uuid',
         ];
     }
 

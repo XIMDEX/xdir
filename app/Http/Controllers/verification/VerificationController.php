@@ -22,16 +22,6 @@ class VerificationController extends Controller
       $this->userService = $userService;
     }
 
-    /**
-     * Show the email verification notice.
-     *
-     */
-    public function show(Request $request)
-    {
-        return $request->user()->hasVerifiedEmail()
-            ? redirect($this->redirectPath())
-            : view('auth.verify');
-    }
 
     /**
      * Mark the authenticated user's email address as verified.
@@ -41,11 +31,15 @@ class VerificationController extends Controller
      */
     public function verify(string $code)
     {
+        if (!json_decode(base64_decode($code))) {
+            return response()->json(['error' => 'Invalid code.'], Response::HTTP_BAD_REQUEST);
+        }
         try {
             $user = $this->userService->registerUser(json_decode(base64_decode($code)));
             if($user->organizations()->count() > 0) {
                 $invitation = Invitation::where('email', $user->email)->first();
                 if(!$invitation) {
+                    $user->delete();
                     return response()->json(['error' => 'Invitation not found.'], Response::HTTP_NOT_FOUND);
                 }
                 $invitation->status = 'completed';
