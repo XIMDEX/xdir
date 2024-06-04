@@ -14,7 +14,7 @@ class InvitationService
     public function sendInvitation($email, $organizationUuid,$organizationName)
     {
         try {
-            $inviteLink = "organization={$organizationUuid}&email=$email";
+            $inviteLink = "localhost:5173/register?organization={$organizationUuid}&email=$email";
 
             Invitation::create([
                 'uuid' => Str::uuid(), 

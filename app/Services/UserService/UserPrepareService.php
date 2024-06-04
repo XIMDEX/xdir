@@ -27,7 +27,7 @@ class UserPrepareService
         try {
             $user = $this->buildUserArray($userData);
             $encodedUser = $this->encodeUser($user);
-            $this->mailService->sendUserDetails($userData['email'], env('APP_NAME') . '/' . $encodedUser);
+            $this->mailService->sendUserDetails($userData['email'], 'localhost:5173/email_verification/register/'. $encodedUser);
             return $encodedUser;
         } catch (Exception $e) {
             \Log::error($e->getMessage());
