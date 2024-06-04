@@ -73,6 +73,7 @@ class UserService
         $user->access_token = $user->createToken('ximdex')->accessToken;
         if (isset($data->organization_id)) {
             $user->organizations()->attach($data->organization_id);
+            $user->save();
         }
         return $user;
     }
