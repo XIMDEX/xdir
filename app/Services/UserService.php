@@ -85,6 +85,7 @@ class UserService
             if ($user) {
                 $user->access_token = $user->createToken('ximdex')->accessToken;
                 $user->p = $this->getUserToolRoles($user);
+                $user->organizations = $user->organizations()->pluck('name', 'uuid')->toArray();
                 return $user;
             }
             return null;
@@ -105,6 +106,7 @@ class UserService
         try {
             $user = $this->user->findOrFail($id);
             $user->p = $this->getUserToolRoles($user);
+            $user->organizations = $user->organizations()->pluck('name', 'uuid')->toArray();
             return $user;
         } catch (Exception $e) {
             return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
