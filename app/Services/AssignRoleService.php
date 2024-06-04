@@ -9,19 +9,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssignRoleService
 {
-    public function assignRole(User $user, $roles, string $organizationId, string $toolId)
+    public function assignRole(User $user, $roles, array $organizations, array $tools)
     {
         \DB::beginTransaction();
         try {
 
-            $currentRoles = $this->getRolesForOrganization($user, $organizationId);
+            array_map(function($organizationId) use ($user, $roles, $tools) {
+                array_map(function($toolId) use ($user, $roles, $organizationId) {
+                    $this->processToolRoles($user, $roles, $organizationId, $toolId);
+                }, $tools);
+            }, $organizations);
 
-            $rolesToAdd = array_diff($roles, $currentRoles);
-            $rolesToRemove = array_diff($currentRoles, $roles);
-
-
-            $this->addRoles($user, $rolesToAdd, $organizationId, $toolId);
-            $this->removeRoles($user, $rolesToRemove, $organizationId, $toolId);
 
             \DB::commit();
         } catch (\Exception $e) {
@@ -98,5 +96,16 @@ class AssignRoleService
                 'tool_id' => $toolId
             ]);
         }
+    }
+
+    private function processToolRoles(User $user, $roles, $organizationId, $toolId)
+    {
+        $currentRoles = $this->getRolesForOrganization($user, $organizationId);
+
+        $rolesToAdd = array_diff($roles, $currentRoles);
+        $rolesToRemove = array_diff($currentRoles, $roles);
+
+        $this->addRoles($user, $rolesToAdd, $organizationId, $toolId);
+        $this->removeRoles($user, $rolesToRemove, $organizationId, $toolId);
     }
 }
