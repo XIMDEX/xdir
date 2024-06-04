@@ -5,7 +5,6 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserPaginationRequest;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class UserController extends Controller
@@ -32,10 +31,10 @@ class UserController extends Controller
         }
     }
 
-    public function getUser(Request $request)
+    public function getUser(string $id)
     {
         try {
-            $user = $this->userService->getUserByLogin($request->only('email', 'password')); 
+            $user = $this->userService->getUserById($id);
             $user->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
             return response()->json(['user' => $user]);
         } catch (\Exception $e) {

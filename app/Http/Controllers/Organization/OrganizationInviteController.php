@@ -27,13 +27,6 @@ class OrganizationInviteController extends Controller
 
     public function sendInvite(SendInviteRequest $request, Organization $organization)
     {
-        $validator = Validator::make(['uuid' => $organization->uuid], [
-            'uuid' => 'required|exists:organizations,uuid',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
         try {
             $email = $request->route('email');
 

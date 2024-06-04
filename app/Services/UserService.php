@@ -84,7 +84,7 @@ class UserService
             $user = $this->auth->user();
             if ($user) {
                 $user->access_token = $user->createToken('ximdex')->accessToken;
-                $user->p = $this->getUserToolRoles($user);
+                $user->p = $this->getUserToolRoles();
                 return $user;
             }
             return null;
@@ -104,7 +104,7 @@ class UserService
     {
         try {
             $user = $this->user->findOrFail($id);
-            $user->p = $this->getUserToolRoles($user);
+            $user->p = $this->getUserToolRoles();
             return $user;
         } catch (Exception $e) {
             return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
@@ -199,10 +199,10 @@ class UserService
     }
 
 
-    private function getUserToolRoles($user) {
-        if ($user->roles()->exists()) {
+    private function getUserToolRoles() {
+        if ($this->user->roles()->exists()) {
             $userToolRoles = [];
-            $roles = $user->roles->load('tools');
+            $roles = $this->user->roles->load('tools');
             foreach ($roles as $role) {
                 $userToolRoles[$role->tools->first()->hash] = [
                     'organization' => $role->pivot->organization_id,
