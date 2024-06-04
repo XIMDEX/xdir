@@ -35,7 +35,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserById($id);
-            $user->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
+            $user->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at','roles']); 
             return response()->json(['user' => $user]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
