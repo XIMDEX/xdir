@@ -208,7 +208,9 @@ class UserService
             foreach ($roles as $role) {
                 $userToolRoles[$role->tools->first()->hash] = [
                     'organization' => $role->pivot->organization_id,
-                    'permission' => $this->rolesBitwiseMap[strtolower($role->name)]
+                    'permission' => $this->rolesBitwiseMap[strtolower($role->name)],
+                    'role' => $role->name,
+                    'tool' => ['name'=>$role->tools->first()->name,'type' => $role->tools->first()->type]
                 ];
             }
             return $userToolRoles;
