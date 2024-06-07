@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Organization;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Services\OrganizationService;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class OrganizationController extends Controller
 {
-    protected $organizationService;
+    protected $organizationService; 
+    protected $auth;
 
-    public function __construct(OrganizationService $organizationService)
+    public function __construct(OrganizationService $organizationService,Guard $auth)
     {
         $this->organizationService = $organizationService;
+        $this->auth = $auth;
     }
 
     public function create(Request $request)

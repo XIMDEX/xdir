@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AssingRoleToUserRequest extends FormRequest
+class AssignRoleToUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class AssingRoleToUserRequest extends FormRequest
     {
         return [
             'user_uuid' => 'required|exists:users,uuid',
-            'roles' => 'required|array|exists:roles,uuid',
+            'roles' => 'required|string|exists:roles,uuid',
             'organizations' => 'required|array|exists:organizations,uuid',
             'tools' => 'required|array|exists:tools,uuid',
         ];

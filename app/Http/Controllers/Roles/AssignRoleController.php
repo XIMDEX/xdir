@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Roles;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AssingRoleToUserRequest;
+use App\Http\Requests\AssignRoleToUserRequest;
 use App\Http\Requests\RevokeRoleToUserRequest;
 use App\Models\Role;
 use App\Models\User;
@@ -22,15 +22,15 @@ class AssignRoleController extends Controller
         $this->assignRoleService = $assignRoleService;
     }
 
-    public function assignRoleToUser(AssingRoleToUserRequest $request)
+    public function assignRoleToUser(AssignRoleToUserRequest $request)
     {
-        try {
-            $user = User::findOrFail($request->user_uuid);
-            $this->assignRoleService->assignRole($user, $request->role_uuid, $request->organizations, $request->tools);
-            return response()->json(['message' => 'Role assigned successfully'], Response::HTTP_OK);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+            try {
+                $user = User::findOrFail($request->user_uuid);
+                $this->assignRoleService->assignRole($user, $request->role_uuid, $request->organizations, $request->tools);
+                return response()->json(['message' => 'Role assigned successfully'], Response::HTTP_OK);
+            } catch (Exception $e) {
+                return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
     }
 
     public function unassignRole(RevokeRoleToUserRequest $request)

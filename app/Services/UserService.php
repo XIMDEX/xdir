@@ -181,9 +181,11 @@ class UserService
         return false;
     }
 
-    public function getAllUsers($page = 1)
+    public function getAllUsersFilterByOrganization($page = 1, $organizations)
     {
-        $paginationResult = User::paginate(20, ['*'], 'page', $page);
+        $paginationResult = User::whereHas('organizations', function ($query) use ($organizations) {
+            $query->whereIn('organization_id', $organizations);
+        })->paginate(20, ['*'], 'page', $page);
         
         $customResult = [
             'total'        => $paginationResult->total(),

@@ -14,7 +14,7 @@ class UserController extends Controller
     protected $userService;
     protected $auth;
 
-    public function __construct(UserService $userService,Guard $auth)
+    public function __construct(UserService $userService, Guard $auth)
     {
         $this->userService = $userService;
         $this->auth = $auth;
@@ -24,9 +24,9 @@ class UserController extends Controller
     {
         try {
             $page = $request->query('page', 1);
-            $users = $this->userService->getAllUsers($page); 
-           
-           // $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
+            $users = $this->userService->getAllUsersFilterByOrganization($page,$this->auth->user()->organization);
+
+            // $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
             return response()->json(['users' => $users]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -36,31 +36,24 @@ class UserController extends Controller
 
     public function getUser(string $id)
     {
-   
-        if ($this->auth->user()->hasRole(['admin','superadmin'])){
-            try {
-                $user = $this->userService->getUserById($id);
-                $user->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at','roles']); 
-                return response()->json(['user' => $user]);
-            } catch (\Exception $e) {
-                \Log::error($e->getMessage());
-                return response()->json(['error' => 'An error occurred while fetching the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        }else{
-            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        try {
+            $user = $this->userService->getUserById($id);
+            $user->makeHidden(['password', 'remember_token', 'email_verified_at', 'created_at', 'updated_at', 'roles']);
+            return response()->json(['user' => $user]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
     }
 
     public function deleteUser($id)
     {
         try {
-            $user = $this->userService->deleteUser($id); 
+            $user = $this->userService->deleteUser($id);
             return response()->json(['message' => 'User deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }
