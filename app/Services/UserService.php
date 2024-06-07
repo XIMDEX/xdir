@@ -184,7 +184,7 @@ class UserService
     public function getAllUsersFilterByOrganization($page = 1, $organizations)
     {
         $paginationResult = User::whereHas('organizations', function ($query) use ($organizations) {
-            $query->whereIn('organization_id', $organizations);
+            $query->whereIn('organization_uuid', $organizations);
         })->paginate(20, ['*'], 'page', $page);
         
         $customResult = [

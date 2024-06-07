@@ -24,7 +24,7 @@ class UserController extends Controller
     {
         try {
             $page = $request->query('page', 1);
-            $users = $this->userService->getAllUsersFilterByOrganization($page,$this->auth->user()->organization);
+            $users = $this->userService->getAllUsersFilterByOrganization($page,$this->auth->user()->organizations->pluck('uuid')->toArray());
 
             // $users->makeHidden(['password', 'remember_token','email_verified_at','created_at','updated_at']); 
             return response()->json(['users' => $users]);
