@@ -19,11 +19,11 @@ class ToolController extends Controller
     public function getTools(Request $request)
     {
         $tools = $request->user()->tools;
-        return response()->json(['tools' => $tools], Response::HTTP_OK);
+        return response()->json(['services' => $tools], Response::HTTP_OK);
     }
 
     public function getList(){
         $tools = $this->tool->all();
-        return response()->json(['tools' => $tools], Response::HTTP_OK);
+        return response()->json(['services' => $tools], Response::HTTP_OK);
     }
 }

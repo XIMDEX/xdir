@@ -36,9 +36,9 @@ class CustomClaim
         $roles = $user->roles()->get()->map(function ($role) {
             return [
                 'name' => $role->name,
-                'tool_id' => $role->pivot->tool_id,
+                'service_id' => $role->pivot->tool_id,
                 'organization_id' => $role->pivot->organization_id,
-                'tool_hash' => $role->tools->first()->hash
+                'service_hash' => $role->tools->first()->hash
             ];
         })->all();
 
