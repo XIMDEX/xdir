@@ -4,15 +4,10 @@ namespace App\Http\Controllers\Organization;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SendInviteRequest;
-use App\Mail\OrganizationInviteMail;
 use App\Models\Invitation;
 use App\Models\Organization;
 use App\Services\InvitationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
 
 class OrganizationInviteController extends Controller
