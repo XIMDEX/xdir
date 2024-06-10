@@ -3,21 +3,24 @@
 namespace App\Services;
 
 use App\Models\Invitation;
-use App\Models\Organization;
 use App\Mail\OrganizationInviteMail;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvitationService
 {
+    protected $uuidService;
+    public function __construct()
+    {
+        $this->uuidService = new UuidService();
+    }
     public function sendInvitation($email, $organizationUuid,$organizationName)
     {
         try {
             $inviteLink = "localhost:5173/register?organization={$organizationUuid}&email=$email";
 
             Invitation::create([
-                'uuid' => Str::uuid(), 
+                'uuid' => $this->uuidService->generateUuid(), 
                 'email' => $email,
                 'organization_id' => $organizationUuid, 
                 'status' => 'pending'
