@@ -1,16 +1,35 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Organization;
 use Exception;
-use Ramsey\Uuid\Uuid;
+
 
 class OrganizationService
 {
+
+    protected $uuidService;
+
+    /**
+     * @param UuidService $uuidService
+     */
+    public function __construct(UuidService $uuidService)
+    {
+        $this->uuidService = $uuidService;
+    }
+
+    /**
+     * Creates a new organization with the given data.
+     *
+     * @param array $data The data for the organization to create.
+     * @throws Exception If there is any issue during creation.
+     * @return array An array containing the success status and the organization data or error message.
+     */
     public function createOrganization(array $data)
     {
         try {
-            $data['uuid'] = Uuid::uuid4()->toString();
+            $data['uuid'] = $this->uuidService->generateUuid();
             $organization = Organization::create($data);
 
             return [
@@ -25,7 +44,16 @@ class OrganizationService
         }
     }
 
-    public function updateOrganization(Organization $organization, array $data){
+    /**
+     * Updates the specified organization with the given data.
+     *
+     * @param Organization $organization The organization to update.
+     * @param array $data The data to update the organization with.
+     * @throws Exception If there is any issue during the update.
+     * @return array An array containing the success status and updated organization data or error message.
+     */
+    public function updateOrganization(Organization $organization, array $data)
+    {
         try {
             $organization->name = $data['name'];
             $organization->save();
@@ -41,6 +69,14 @@ class OrganizationService
             ];
         }
     }
+
+    /**
+     * Deletes the organization with the given UUID.
+     *
+     * @param string $uuid The UUID of the organization to delete.
+     * @throws Exception If there is any issue during deletion.
+     * @return array An array containing the success status and a message.
+     */
 
     public function deleteOrganization($uuid)
     {
@@ -66,8 +102,17 @@ class OrganizationService
             ];
         }
     }
+    /**
+     * Checks if an organization exists with the given UUID.
+     *
+     * @param string $uuid The UUID of the organization to check.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If no organization is found.
+     * @throws \Exception If an unexpected error occurs.
+     * @return array An array containing the success status and optionally an error message.
+     */
 
-    public function organizationExist(string $uuid){
+    public function organizationExist(string $uuid)
+    {
         try {
             $organization = Organization::findOrFail($uuid);
             return [
@@ -87,8 +132,14 @@ class OrganizationService
             ];
         }
     }
-    
-    public function getAllOrganizations(){
+
+    /**
+     * Retrieves all organizations.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection Returns a collection of all organizations.
+     */
+    public function getAllOrganizations()
+    {
         return Organization::all();
     }
 }

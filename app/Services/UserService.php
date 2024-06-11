@@ -26,12 +26,18 @@ class UserService
         'superadmin' => '11111111',
     ];
 
+    /**
+     * Constructs a new instance of the class.
+     *
+     * @param Guard $auth The authentication service.
+     * @param Hasher $hasher The hashing service.
+     * @param User $user The user model.
+     */
     public function __construct(Guard $auth, Hasher $hasher, User $user)
     {
         $this->auth = $auth;
         $this->hasher = $hasher;
         $this->user = $user;
-        
     }
 
     /**
@@ -77,6 +83,13 @@ class UserService
         return $user;
     }
 
+    /**
+     * Retrieves a user by their login credentials.
+     *
+     * @param array $data The login credentials, including email and password.
+     * @throws Exception If an error occurs while retrieving the user.
+     * @return User|null The user object if found, or null if not found.
+     */
     public function getUserByLogin(array $data)
     {
         try {
@@ -113,6 +126,19 @@ class UserService
         }
     }
 
+    /**
+     * Updates the user's information based on the provided data.
+     *
+     * @param array $data The data containing the updated user information.
+     *                    The following keys are supported:
+     *                    - email: The new email address.
+     *                    - name: The new name.
+     *                    - surname: The new surname.
+     *                    - password: The new password.
+     *                    - birthdate: The new birthdate.
+     * @throws \Exception If an error occurs while updating the user.
+     * @return \Illuminate\Http\JsonResponse|User The updated user object or a JSON response with an error message.
+     */
     public function updateUser(array $data)
     {
         try {
@@ -121,7 +147,7 @@ class UserService
 
             if (isset($data['email']) && $this->checkEmail($data, $user->email)) {
                 $user->email = $data['email'];
-            } 
+            }
 
             if (isset($data['name'])) {
                 $user->name = $data['name'];
@@ -149,6 +175,13 @@ class UserService
         }
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param int $id The ID of the user to be deleted.
+     * @throws \Exception If an error occurs while deleting the user.
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Http\JsonResponse The deleted user, or a JSON response with an error message.
+     */
     public function deleteUser($id)
     {
         try {
@@ -159,7 +192,6 @@ class UserService
             \Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred while deleting user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-     
     }
 
     protected function checkEmail(array $data, string $email)
@@ -181,12 +213,19 @@ class UserService
         return false;
     }
 
+    /**
+     * Retrieves all users filtered by the given organizations.
+     *
+     * @param int $page The page number to retrieve (default: 1).
+     * @param array $organizations The array of organization UUIDs to filter by.
+     * @return array The custom result containing the total, last item, current page, and data.
+     */
     public function getAllUsersFilterByOrganization($page = 1, $organizations)
     {
         $paginationResult = User::whereHas('organizations', function ($query) use ($organizations) {
             $query->whereIn('organization_uuid', $organizations);
         })->paginate(20, ['*'], 'page', $page);
-        
+
         $customResult = [
             'total'        => $paginationResult->total(),
             'to'           => $paginationResult->lastItem(),
@@ -197,13 +236,28 @@ class UserService
         return $customResult;
     }
 
+    /**
+     * Adds a user to an organization.
+     *
+     * @param mixed $user The user object to be added to the organization.
+     * @param mixed $organization The organization object to which the user will be added.
+     * @throws \Exception If there is an error attaching the user to the organization.
+     * @return void
+     */
     public function addUserToOrganization($user, $organization)
     {
         $user->organizations()->attach($organization->id);
     }
 
 
-    private function getUserToolRoles($user) {
+    /**
+     * Retrieves the user's tool roles.
+     *
+     * @param User $user The user object.
+     * @return array|null Returns an array of user tool roles, or null if the user has no roles.
+     */
+    private function getUserToolRoles($user)
+    {
         if ($user->roles()->exists()) {
             $userToolRoles = [];
             $roles = $user->roles->load('tools');
@@ -212,7 +266,7 @@ class UserService
                     'organization' => $role->pivot->organization_id,
                     'permission' => $this->rolesBitwiseMap[strtolower($role->name)],
                     'role' => $role->name,
-                    'tool' => ['name'=>$role->tools->first()->name,'type' => $role->tools->first()->type]
+                    'tool' => ['name' => $role->tools->first()->name, 'type' => $role->tools->first()->type]
                 ];
             }
             return $userToolRoles;
