@@ -22,10 +22,13 @@ class AssignRoleToUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_uuid' => 'required|exists:users,uuid',
-            'roles' => 'required|string|exists:roles,uuid',
-            'organizations' => 'required|array|exists:organizations,uuid',
-            'services' => 'required|array|exists:tools,uuid',
+            'user_uuid' => 'required|uuid',
+            'organizations' => 'required|array',
+            'organizations.*.organization_uuid' => 'required|uuid',
+            'organizations.*.services' => 'required|array',
+            'organizations.*.services.*.service_uuid' => 'required|uuid',
+            'organizations.*.services.*.role_uuid' => 'required|array',
+            'organizations.*.services.*.role_uuid.*' => 'required|uuid',
         ];
     }
 }

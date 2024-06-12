@@ -9,15 +9,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssignRoleService
 {
-    public function assignRole(User $user, $role, array $organizations, array $tools)
+    public function assignRole(User $user,array $organizations)
     {
         \DB::beginTransaction();
         try {
 
-            array_map(function($organizationId) use ($user, $role, $tools) {
-                array_map(function($toolId) use ($user, $role, $organizationId) {
-                    $this->processToolRoles($user, $role, $organizationId, $toolId);
-                }, $tools);
+            array_map(function($organization) use ($user,$organizations) {
+                array_map(function($service) use ($user, $organization) {
+                    $this->processToolRoles($user, $service['role_uuid'], $organization['organization_uuid'], $service['service_uuid']);
+                }, $organization['services']);
             }, $organizations);
 
 
