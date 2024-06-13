@@ -7,6 +7,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
@@ -186,6 +187,12 @@ class UserService
     {
         try {
             $user = $this->user->find($id);
+            $user->email = Hash::make($user->email);
+            $user->password = Hash::make($user->password);
+            $user->name = Hash::make($user->name);
+            $user->birthdate = Hash::make($user->birthdate);
+            $user->surname = Hash::make($user->surname);
+            $user->save();
             $user->delete();
             return $user;
         } catch (\Exception $e) {

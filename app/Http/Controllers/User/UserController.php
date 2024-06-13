@@ -49,8 +49,14 @@ class UserController extends Controller
     public function deleteUser($id)
     {
         try {
-            $user = $this->userService->deleteUser($id);
-            return response()->json(['message' => 'User deleted successfully'], Response::HTTP_OK);
+            if ($this->auth->user()->hasRole('admin|superadmin') || $this->auth->user()->id == $id) {
+                $this->userService->deleteUser($id);
+                return response()->json(['message' => 'User deleted successfully'], Response::HTTP_OK);
+            }else{
+                return response()->json(['error' => 'Only admin can delete user'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred while deleting the user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
