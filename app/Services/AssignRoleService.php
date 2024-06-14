@@ -68,10 +68,11 @@ class AssignRoleService
     }
 
 
-    private function getRolesForOrganization($user, $organizationId)
+    private function getRolesForOrganizationAndTool($user, $organizationId, $toolId)
     {
         return $user->roles()
             ->wherePivot('organization_id', $organizationId)
+            ->wherePivot('tool_id', $toolId)
             ->pluck('role_id')
             ->toArray();
     }
@@ -100,7 +101,7 @@ class AssignRoleService
 
     private function processToolRoles(User $user, $roles, $organizationId, $toolId)
     {
-        $currentRoles = $this->getRolesForOrganization($user, $organizationId);
+        $currentRoles = $this->getRolesForOrganizationAndTool($user, $organizationId,$toolId);
 
         $rolesToAdd = array_diff($roles, $currentRoles);
         $rolesToRemove = array_diff($currentRoles, $roles);
