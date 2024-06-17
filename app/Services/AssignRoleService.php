@@ -91,11 +91,16 @@ class AssignRoleService
     private function removeRoles($user, $roles, $organizationId, $toolId)
     {
         if (!empty($roles)) {
-            $user->roles()
-                 ->wherePivot('organization_id', $organizationId)
-                 ->wherePivot('tool_id', $toolId)
-                 ->whereIn('id', $roles) 
-                 ->detach();
+            $pivotTable = $user->roles()->getTable(); // Get the pivot table name
+            $pivotForeignKey = $user->roles()->getForeignPivotKeyName(); // Get the foreign key name for User
+            $pivotRelatedKey = $user->roles()->getRelatedPivotKeyName(); // Get the related key name for Role
+
+            \DB::table($pivotTable)
+                ->where($pivotForeignKey, $user->getKey())
+                ->whereIn($pivotRelatedKey, $roles)
+                ->where('organization_id', $organizationId)
+                ->where('tool_id', $toolId)
+                ->delete();
         }
     }
 
