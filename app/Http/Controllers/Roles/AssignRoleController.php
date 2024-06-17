@@ -29,7 +29,7 @@ class AssignRoleController extends Controller
                 $this->assignRoleService->assignRole($user,$request->organizations);
                 return response()->json(['message' => 'Role assigned successfully'], Response::HTTP_OK);
             } catch (Exception $e) {
-                return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+                return response()->json(['error' => 'An error occurred while assigning the role'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
     }
 

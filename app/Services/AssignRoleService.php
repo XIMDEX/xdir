@@ -25,7 +25,7 @@ class AssignRoleService
         } catch (\Exception $e) {
             \DB::rollBack();
             \Log::error('Error synchronizing roles: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to assign roles'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new Exception('Error synchronizing roles: ' . $e->getMessage());
         }
         return $user;
     }
