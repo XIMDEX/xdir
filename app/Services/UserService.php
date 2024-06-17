@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\UserDetailMail;
+use App\Models\Tool;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Auth\Guard;
@@ -268,12 +269,19 @@ class UserService
         if ($user->roles()->exists()) {
             $userToolRoles = [];
             $roles = $user->roles->load('tools');
+            // Get all unique tool IDs from roles
+            $toolIds = $user->roles->pluck('pivot.tool_id')->unique();
+
+            // Retrieve all tools with those IDs
+            $tools = Tool::whereIn('uuid', $toolIds)->get()->keyBy('uuid');
             foreach ($roles as $role) {
-                $userToolRoles[$role->tools->first()->hash] = [
+                $toolId = $role->pivot->tool_id;
+                $tool = $tools[$toolId];
+                $userToolRoles[$tool->hash] = [
                     'organization' => $role->pivot->organization_id,
                     'permission' => $this->rolesBitwiseMap[strtolower($role->name)],
                     'role' => $role->name,
-                    'tool' => ['name' => $role->tools->first()->name, 'type' => $role->tools->first()->type]
+                    'tool' => ['name' => $tool->name, 'type' => $tool->type]
                 ];
             }
             return $userToolRoles;
