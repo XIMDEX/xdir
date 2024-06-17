@@ -9,13 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssignRoleService
 {
-    public function assignRole(User $user,array $organizations)
+    public function assignRole(User $user, array $organizations)
     {
         \DB::beginTransaction();
         try {
 
-            array_map(function($organization) use ($user,$organizations) {
-                array_map(function($service) use ($user, $organization) {
+            array_map(function ($organization) use ($user, $organizations) {
+                array_map(function ($service) use ($user, $organization) {
                     $this->processToolRoles($user, $service['role_uuid'], $organization['organization_uuid'], $service['service_uuid']);
                 }, $organization['services']);
             }, $organizations);
@@ -83,7 +83,7 @@ class AssignRoleService
             $user->roles()->attach($role, [
                 'organization_id' => $organizationId,
                 'model_type' => get_class($this),
-                'tool_id' => $toolId
+                'tool_id' => $toolId,
             ]);
         }
     }
@@ -91,17 +91,17 @@ class AssignRoleService
     private function removeRoles($user, $roles, $organizationId, $toolId)
     {
         if (!empty($roles)) {
-            $user->roles()->detach($roles, [
-                'organization_id' => $organizationId,
-                'model_type' => get_class($this),
-                'tool_id' => $toolId
-            ]);
+            $user->roles()
+                 ->wherePivot('organization_id', $organizationId)
+                 ->wherePivot('tool_id', $toolId)
+                 ->whereIn('id', $roles) 
+                 ->detach();
         }
     }
 
     private function processToolRoles(User $user, $roles, $organizationId, $toolId)
     {
-        $currentRoles = $this->getRolesForOrganizationAndTool($user, $organizationId,$toolId);
+        $currentRoles = $this->getRolesForOrganizationAndTool($user, $organizationId, $toolId);
 
         $rolesToAdd = array_diff($roles, $currentRoles);
         $rolesToRemove = array_diff($currentRoles, $roles);
