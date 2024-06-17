@@ -27,8 +27,8 @@ class AssignRoleToUserRequest extends FormRequest
             'organizations.*.organization_uuid' => 'required|uuid',
             'organizations.*.services' => 'required|array',
             'organizations.*.services.*.service_uuid' => 'required|uuid',
-            'organizations.*.services.*.role_uuid' => 'required|array',
-            'organizations.*.services.*.role_uuid.*' => 'required',
+            'organizations.*.services.*.role_uuid' => 'sometimes|array',
+            'organizations.*.services.*.role_uuid.*' => 'sometimes|nullable|exists:roles,uuid',
         ];
     }
 }
