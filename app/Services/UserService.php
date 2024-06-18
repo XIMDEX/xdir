@@ -191,14 +191,13 @@ class UserService
             $user->email = Hash::make($user->email);
             $user->password = Hash::make($user->password);
             $user->name = Hash::make($user->name);
-            $user->birthdate = Hash::make($user->birthdate);
             $user->surname = Hash::make($user->surname);
             $user->save();
             $user->delete();
             return $user;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred while deleting user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new \Exception($e->getMessage());
         }
     }
 
