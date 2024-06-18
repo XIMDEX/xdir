@@ -31,7 +31,20 @@ class InvitationService
             return ['message' => 'Invitation sent successfully!', 'status' => Response::HTTP_OK];
         } catch (\Exception $e) {
             \Log::error('Error sending invitation: ' . $e->getMessage());
-            return ['error' => 'An error occurred while sending the invitation', 'status' => Response::HTTP_INTERNAL_SERVER_ERROR];
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function delete($uuid)
+    {
+        try {
+            $invitation = Invitation::where('uuid', $uuid)->first();
+            $invitation->delete();
+            return ['message' => 'Invitation deleted successfully!', 'status' => Response::HTTP_OK];
+        } catch (\Exception $e) {
+            \Log::error('Error deleting invitation: ' . $e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 }
+

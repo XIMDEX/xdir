@@ -40,4 +40,15 @@ class OrganizationInviteController extends Controller
     {
         return response()->json(['invitations' => Invitation::all()]);
     }
+
+    public function delete ($uuid)
+    {
+        try {
+          $this->invitationService->delete($uuid);
+          return response()->json(['message' => 'Invitation deleted successfully!'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting invitation: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while deleting the invitation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

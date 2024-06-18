@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\UserDetailMail;
+use App\Models\Invitation;
 use App\Models\Tool;
 use App\Models\User;
 use Exception;
@@ -69,20 +70,34 @@ class UserService
 
             return $base64User;
         } catch (Exception $e) {
-            return false;
+            throw new \Exception($e->getMessage());
         }
     }
 
 
     public function registerUser($data)
     {
-        $user = $this->user->create(get_object_vars($data));
-        $user->markEmailAsVerified();
-        $user->access_token = $user->createToken('ximdex')->accessToken;
-        if (isset($data->organization_id)) {
-            $user->organizations()->attach($data->organization_id);
+        try {
+            if (isset($data->organization_id)) {
+                $invitation = Invitation::where('email', $data->email)
+                    ->where('organization_id', $data->organization_id)
+                    ->where('status', 'pending')
+                    ->first();
+
+                if (!$invitation) {
+                    throw new Exception('Invalid invitation');
+                }
+            }
+            $user = $this->user->create(get_object_vars($data));
+            $user->markEmailAsVerified();
+            $user->access_token = $user->createToken('ximdex')->accessToken;
+            if (isset($data->organization_id)) {
+                $user->organizations()->attach($data->organization_id);
+            }
+            return $user;
+        } catch (Exception $e) {
+            throw new \Exception($e->getMessage());
         }
-        return $user;
     }
 
     /**
@@ -106,7 +121,7 @@ class UserService
             return null;
         } catch (Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred while retrieving user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -124,7 +139,7 @@ class UserService
             $user->organizations = $user->organizations()->pluck('name', 'uuid')->toArray();
             return $user;
         } catch (Exception $e) {
-            return response()->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -173,7 +188,7 @@ class UserService
             return $user;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred while updating user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw new \Exception($e->getMessage());
         }
     }
 

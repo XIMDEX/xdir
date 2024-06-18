@@ -36,7 +36,7 @@ class AssignRoleService
             $user->removeRole($role);
         } catch (Exception $e) {
             // Handle any exceptions that occur during role revocation
-            echo 'Error revoking role: ' . $e->getMessage();
+            throw new \Exception($e->getMessage());
         }
     }
 
