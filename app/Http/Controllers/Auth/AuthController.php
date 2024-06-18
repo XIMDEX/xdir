@@ -28,34 +28,53 @@ class AuthController extends Controller
         'superAdmin' => '00000001',
     ];
 
-
-    public function __construct(UserService $userService,UserPrepareService $userPrepareService)
+    /**
+     * Constructs a new instance of the class.
+     *
+     * @param UserService $userService The UserService instance.
+     * @param UserPrepareService $userPrepareService The UserPrepareService instance.
+     */
+    public function __construct(UserService $userService, UserPrepareService $userPrepareService)
     {
-      $this->userService = $userService;
-      $this->userPrepareService = $userPrepareService;
+        $this->userService = $userService;
+        $this->userPrepareService = $userPrepareService;
     }
+
+    /**
+     * Register a new user.
+     *
+     * @param RegisterRequest $request The registration request.
+     * @throws \Exception If an error occurs during registration.
+     * @return \Illuminate\Http\JsonResponse The JSON response containing the registered user or an error message.
+     */
     public function register(RegisterRequest $request)
     {
         try {
-           $user = $this->userPrepareService->prepareUserRegistration($request->validated());
-           if ($user) {
-            return response()->json(['message' => $user], Response::HTTP_CREATED);
-           }else{
-            return response()->json(['error' => "User could not been created"], Response::HTTP_INTERNAL_SERVER_ERROR);
-           }
-          
+            $user = $this->userPrepareService->prepareUserRegistration($request->validated());
+            if ($user) {
+                return response()->json(['message' => $user], Response::HTTP_CREATED);
+            } else {
+                return response()->json(['error' => "User could not been created"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         } catch (\Exception $e) {
             \Log::error($e);
             return response()->json(['error' => 'An error occurred while registering the user. Please try again later.' . $e], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Logs in a user with the provided credentials.
+     *
+     * @param LoginRequest $request The login request containing the email and password.
+     * @throws \Exception If an error occurs during the login process.
+     * @return \Illuminate\Http\JsonResponse The JSON response containing the logged-in user or an error message.
+     */
     public function login(LoginRequest $request)
     {
         try {
             $user = $this->userService->getUserByLogin($request->only('email', 'password'));
-            if($user){
-                $user->makeHidden(['created_at', 'updated_at','roles']);
+            if ($user) {
+                $user->makeHidden(['created_at', 'updated_at', 'roles']);
                 return response()->json(['user' => $user], Response::HTTP_CREATED);
             }
             return response()->json(['error' => 'Login failed'], Response::HTTP_NOT_FOUND);
@@ -63,30 +82,54 @@ class AuthController extends Controller
             \Log::error($e->getMessage());
             return response()->json(['error' => 'Server error occurred. Please try again later.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
     }
 
+     /**
+     * Updates a user's information based on the provided request data.
+     *
+     * @param Request $request The HTTP request containing the user's updated information.
+     * @return JsonResponse The JSON response containing the updated user object or an error message.
+     */
     public function update(Request $request)
     {
-        $data = $request->all();
-        
-        $updatedUser = $this->userService->updateUser($data);
-        if ($updatedUser instanceof JsonResponse) {
-            return $updatedUser;
-        }
-        $updatedUser->makeHidden(['created_at', 'updated_at','uuid']);
+        try {
+            $data = $request->all();
 
-        return response()->json(['user' => $updatedUser]);
+            $updatedUser = $this->userService->updateUser($data);
+            if ($updatedUser instanceof JsonResponse) {
+                return $updatedUser;
+            }
+            $updatedUser->makeHidden(['created_at', 'updated_at', 'uuid']);
+
+            return response()->json(['user' => $updatedUser]);
+        } catch (\Exception $e) {
+            // Log the error internally
+            \Log::error($e);
+            // Return a JSON response with the error message and a 500 status code
+            return response()->json(['error' => 'An error occurred while updating the user. Please try again later.'], 500);
+        }
     }
 
+    /**
+     * Validates the token for the 'api' guard user.
+     *
+     * @return \Illuminate\Http\JsonResponse The JSON response containing the message 'Token is valid' and the user object, or an error message.
+     * @throws \Exception If an error occurs during the validation process.
+     * @return \Illuminate\Http\JsonResponse The JSON response containing the error message.
+     */
     public function validateToken()
-   {
-       $user = Auth::guard('api')->user();
-       
-       if ($user) {
-           return response()->json(['message' => 'Token is valid', 'user' => $user]);
-       } else {
-           return response()->json(['message' => 'Token is invalid'], Response::HTTP_UNAUTHORIZED);
-       }
-   }
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if ($user) {
+                return response()->json(['message' => 'Token is valid', 'user' => $user]);
+            } else {
+                return response()->json(['message' => 'Token is invalid'], Response::HTTP_UNAUTHORIZED);
+            }
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return response()->json(['error' => 'An error occurred while validating the token. Please try again later.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

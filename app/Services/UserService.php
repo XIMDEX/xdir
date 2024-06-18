@@ -75,6 +75,13 @@ class UserService
     }
 
 
+    /**
+     * Registers a user with the given data.
+     *
+     * @param mixed $data The data containing the user information.
+     * @throws \Exception If the invitation is invalid or an error occurs during registration.
+     * @return \App\Models\User The registered user.
+     */
     public function registerUser($data)
     {
         try {
