@@ -38,7 +38,7 @@ class InvitationService
     public function delete($uuid)
     {
         try {
-            $invitation = Invitation::where('uuid', $uuid)->first();
+            $invitation = Invitation::where('id', $uuid)->first();
             $invitation->delete();
             return ['message' => 'Invitation deleted successfully!', 'status' => Response::HTTP_OK];
         } catch (\Exception $e) {
