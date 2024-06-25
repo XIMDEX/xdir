@@ -24,26 +24,14 @@ class CustomClaim
 
         foreach ($user->roles as $role) {
             $permission = $rolesBitwiseMap[strtolower($role->name)] ?? null; // Get the permission from the rolesBitwiseMap
-            foreach ($role->tools as $tool) {
-                $toolHash = $tool->hash; // Get the hash from the tool
-                // Construct the organization#permission string
+            $orgPermission = $permission . '#' . $role->pivot->organization_id;
+            $toolHash = $role->tools->first()->hash ?? null; // Get the tool's hash
+
+            if ($permission && $toolHash) {
                 $orgPermission = $permission . '#' . $role->pivot->organization_id;
-                // Add to the array, grouping by tool_hash
-                $toolsPermissions[$toolHash][] = $orgPermission;
+                $toolsPermissions[$toolHash][] = $orgPermission; // Use $toolHash as the key
             }
         }
-
-        $roles = $user->roles()->get()->map(function ($role) {
-            return [
-                'name' => $role->name,
-                'service_id' => $role->pivot->tool_id,
-                'organization_id' => $role->pivot->organization_id,
-                'service_hash' => $role->tools->first()->hash
-            ];
-        })->all();
-
-        $rolesArray = $user->roles->map(fn ($role) => $rolesBitwiseMap[$role->name])->all();
-
 
         $token->addClaim('p',  $toolsPermissions);
         return $next($token);
