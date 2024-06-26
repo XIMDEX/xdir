@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Builders\PayloadBuilder;
 use App\Models\Tool;
 use Exception;
 
@@ -10,9 +11,16 @@ class ToolService
 
     private $tool = null;
 
-    public function __construct(Tool $tool)
+    private $curlService = null;
+
+    private $payloadBuilder = null;
+
+    public function __construct(Tool $tool, CurlService $curlService, PayloadBuilder $payloadBuilder)
     {
         $this->tool = $tool;
+        $this->curlService = $curlService;
+        $this->payloadBuilder = $payloadBuilder;
+
     }
 
     public function createUserOnService($user, $serviceId)
@@ -22,12 +30,12 @@ class ToolService
             if (!$toolService) {
                 throw new Exception('Tool service not found');
             }
-    
+            
             $serviceUrl = $toolService->url;
             $url = $serviceUrl . '/xdir?XDEBUG_SESSION_START';
-            $payload = $this->preparePayload($user, $serviceId);
-    
-            $response = $this->sendRequest($url, $payload);
+            $data = ['user' => $user, 'toolId' => $serviceId];
+            $payload = $this->payloadBuilder->setData($data)->setAction('createUser')->build();
+            $response = $this->curlService->post($url, $payload);
             $data = json_decode($response);
     
             if (!$response || !$data || !$data->success) {
@@ -48,41 +56,7 @@ class ToolService
             throw $e;
         }
     }
-    
 
-    private function preparePayload($user, $serviceId)
-    {
-        $payload = json_encode([
-            'data' => ['user' => $user, 'toolId' => $serviceId],
-            'action' => 'createUser'
-        ]);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('JSON encode error: ' . json_last_error_msg());
-        }
-
-        return $payload;
-    }
-
-    private function sendRequest($url, $payload)
-    {
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-
-        $response = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            throw new Exception(curl_error($ch));
-        }
-
-        curl_close($ch);
-
-        return $response;
-    }
 
     private function logError($message, $context = [])
     {
