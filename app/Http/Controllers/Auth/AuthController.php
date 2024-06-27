@@ -75,7 +75,8 @@ class AuthController extends Controller
             $user = $this->userService->getUserByLogin($request->only('email', 'password'));
             if ($user) {
                 $user->makeHidden(['created_at', 'updated_at', 'roles']);
-                return response()->json(['user' => $user], Response::HTTP_CREATED);
+                $cookie = cookie('access_token', $user->accessToken, 60); // 60 minutes
+                return response()->json(['user' => $user], Response::HTTP_CREATED)->cookie($cookie);
             }
             return response()->json(['error' => 'Login failed'], Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
