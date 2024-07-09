@@ -32,7 +32,7 @@ class ToolService
             }
             
             $serviceUrl = $toolService->url;
-            $url = $serviceUrl . '/xdir?XDEBUG_SESSION_START';
+            $url = $serviceUrl . '/xdir';
             $data = ['user' => $user, 'toolId' => $serviceId];
             $payload = $this->payloadBuilder->setData($data)->setAction('createUser')->build();
             $response = $this->curlService->post($url, $payload);
