@@ -97,7 +97,7 @@ class UserService
             }
             $user = $this->user->create(get_object_vars($data));
             $user->markEmailAsVerified();
-            $user->access_token = $user->createToken('ximdex')->accessToken;
+            $user->access_token = $user->createToken(env('PASSPORT_TOKEN'))->accessToken;
             if (isset($data->organization_id)) {
                 $user->organizations()->attach($data->organization_id);
             }
@@ -120,7 +120,7 @@ class UserService
             $this->auth->attempt($data);
             $user = $this->auth->user();
             if ($user) {
-                $user->access_token = $user->createToken('ximdex')->accessToken;
+                $user->access_token = $user->createToken(env('PASSPORT_TOKEN'))->accessToken;
                 $user->p = $this->getUserToolRoles($user);
                 $user->organizations = $user->organizations()->pluck('name', 'uuid')->toArray();
                 return $user;
