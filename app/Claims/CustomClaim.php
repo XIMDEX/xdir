@@ -2,10 +2,11 @@
 
 namespace App\Claims;
 
-use App\Models\Role;
 use App\Models\Tool;
 use App\Models\User;
 use CorBosman\Passport\AccessToken;
+
+//Improve this function in the future, removing User and Tool dependency 
 
 class CustomClaim
 {
@@ -23,13 +24,15 @@ class CustomClaim
         $toolsPermissions = [];
 
         foreach ($user->roles as $role) {
-            $permission = $rolesBitwiseMap[strtolower($role->name)] ?? null; // Get the permission from the rolesBitwiseMap
-            $orgPermission = $permission . '#' . $role->pivot->organization_id;
-            $toolHash = $role->tools->first()->hash ?? null; // Get the tool's hash
-
-            if ($permission && $toolHash) {
-                $orgPermission = $permission . '#' . $role->pivot->organization_id;
-                $toolsPermissions[$toolHash][] = $orgPermission; // Use $toolHash as the key
+            $permission = $rolesBitwiseMap[strtolower($role->name)] ?? null;  
+            if ($permission) {
+                $toolId = $role->pivot->tool_id;
+                $tool = Tool::find($toolId);
+                if ($tool) {
+                    $toolHash = $tool->hash;
+                    $orgPermission = $permission . '#' . $role->pivot->organization_id;
+                    $toolsPermissions[$toolHash][] = $orgPermission; // Use $toolHash as the key
+                }
             }
         }
 
