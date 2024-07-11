@@ -12,6 +12,7 @@ Backend de administración y registro de Usuarios y Roles
 # Configuración inicial de xdir-back-v2
 
 Este documento proporciona una guía paso a paso para configurar el entorno de desarrollo del backend de administración y registro de Usuarios y Roles, `xdir-back-v2`. Sigue cuidadosamente las instrucciones para asegurar una correcta configuración del proyecto.
+PHP8.2
 
 ## Requisitos previos
 
