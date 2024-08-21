@@ -21,6 +21,7 @@ class UserService
     protected $hasher;
     protected $uuid;
     protected $user;
+    protected $organizationService;
     private $rolesBitwiseMap = [
         'viewer' => '11100000',
         'creator' => '11110000',
@@ -36,11 +37,12 @@ class UserService
      * @param Hasher $hasher The hashing service.
      * @param User $user The user model.
      */
-    public function __construct(Guard $auth, Hasher $hasher, User $user)
+    public function __construct(Guard $auth, Hasher $hasher, User $user, OrganizationService $organizationService)
     {
         $this->auth = $auth;
         $this->hasher = $hasher;
         $this->user = $user;
+        $this->organizationService = $organizationService;
     }
 
     /**
@@ -95,11 +97,21 @@ class UserService
                     throw new Exception('Invalid invitation');
                 }
             }
+            $existingUser = User::where('email', $data->email)->first();
+            if ($existingUser) {
+                throw new Exception('Email already in use');
+            }
             $user = $this->user->create(get_object_vars($data));
             $user->markEmailAsVerified();
             $user->access_token = $user->createToken(env('PASSPORT_TOKEN'))->accessToken;
             if (isset($data->organization_id)) {
                 $user->organizations()->attach($data->organization_id);
+            }else{
+                $organization = $this->organizationService->createOrganization([
+                    'name' => $user->name . "'s organization",
+                    'user_id' => $user->id,
+                ]);
+                $user->organizations()->attach($organization['organization']->id);
             }
             return $user;
         } catch (Exception $e) {

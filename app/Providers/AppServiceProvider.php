@@ -22,7 +22,8 @@ class AppServiceProvider extends ServiceProvider
             return new UserService(
                 $app->make(\Illuminate\Contracts\Auth\Guard::class),
                 $app->make(\Illuminate\Contracts\Hashing\Hasher::class),
-                $app->make(\App\Models\User::class)
+                $app->make(\App\Models\User::class),
+                $app->make(\App\Services\OrganizationService::class)
             );
         });
     }
