@@ -3,18 +3,19 @@
 namespace App\Services;
 
 use App\Models\Organization;
+use App\Models\User;
+use Symfony\Component\HttpFoundation\Response;
 use Exception;
 
 
 class OrganizationService
 {
-
     protected $uuidService;
 
     /**
      * @param UuidService $uuidService
      */
-    public function __construct(UuidService $uuidService)
+    public function __construct(UuidService $uuidService, )
     {
         $this->uuidService = $uuidService;
     }
@@ -141,5 +142,39 @@ class OrganizationService
     public function getAllOrganizations()
     {
         return Organization::all();
+    }
+
+    /**
+     * Adds a user to an organization.
+     *
+     * @param string $organizationUuid The UUID of the organization to add the user to.
+     * @param string $userUuid The UUID of the user to add to the organization.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the organization or user does not exist.
+     * @throws \Exception If an unexpected error occurs.
+     * @return array An array containing the success status and optionally an error message.
+     */
+    public function addUserToOrganization(string $organizationUuid, string $userUuid)
+    {
+        try {
+            $organization = Organization::findOrFail($organizationUuid);
+            $user = User::findOrFail($userUuid);
+            $organization->users()->syncWithoutDetaching($user);
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'User added to organization successfully'
+            ];
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return [
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => 'Organization or user not found',
+                'error' => $e->getMessage()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'An unexpected error occurred',
+                'error' => $e->getMessage()
+            ];
+        }
     }
 }

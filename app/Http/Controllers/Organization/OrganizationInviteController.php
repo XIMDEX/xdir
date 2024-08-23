@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SendInviteRequest;
 use App\Models\Invitation;
 use App\Models\Organization;
+use App\Models\User;
 use App\Services\InvitationService;
+use App\Services\OrganizationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,17 +16,24 @@ class OrganizationInviteController extends Controller
 {
 
     protected $invitationService;
+    protected $organizationService;
 
-    public function __construct(InvitationService $invitationService)
+    public function __construct(InvitationService $invitationService, OrganizationService $organizationService)
     {
         $this->invitationService = $invitationService;
+        $this->organizationService = $organizationService;
     }
 
     public function sendInvite(SendInviteRequest $request, Organization $organization)
     {
         try {
             $email = $request->route('email');
+            $user = User::where('email', $email)->first();
 
+            if ($user) {
+                $result = $this->organizationService->addUserToOrganization($organization->uuid, $user->uuid);
+                return response()->json($result, $result['status']);
+            }
             $result = $this->invitationService->sendInvitation($email, $organization->uuid, $organization->name);
 
             return response()->json($result, $result['status']);

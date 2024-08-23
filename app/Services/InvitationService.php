@@ -17,7 +17,7 @@ class InvitationService
     public function sendInvitation($email, $organizationUuid,$organizationName)
     {
         try {
-            $inviteLink = "localhost:5173/register?organization={$organizationUuid}&email=$email";
+            $inviteLink = env('APP_URL') . "/register?organization={$organizationUuid}&email=$email";
 
             Invitation::create([
                 'uuid' => $this->uuidService->generateUuid(), 
@@ -46,5 +46,7 @@ class InvitationService
             throw new \Exception($e->getMessage());
         }
     }
+
+    
 }
 
