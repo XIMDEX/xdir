@@ -7,15 +7,25 @@ use App\Models\User;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
+
+
 class AssignRoleService
 {
+    protected $toolService;
+    public function __construct(ToolService $toolService)
+    {
+        $this->toolService = $toolService;
+    }
+
+
     public function assignRole(User $user, array $organizations)
     {
         \DB::beginTransaction();
         try {
 
-            array_map(function ($organization) use ($user, $organizations) {
+            array_map(function ($organization) use ($user) {
                 array_map(function ($service) use ($user, $organization) {
+                    // $this->toolService->createUserOnService($user, $service['service_uuid']);
                     $this->processToolRoles($user, $service['role_uuid'], $organization['organization_uuid'], $service['service_uuid']);
                 }, $organization['services']);
             }, $organizations);
@@ -30,13 +40,17 @@ class AssignRoleService
         return $user;
     }
 
-    public function revokeRole(User $user, $role)
+    public function revokeRole(User $user, $roleId, $organizationId, $toolId)
     {
         try {
-            $user->removeRole($role);
+            $user->roles()
+                ->wherePivot('role_id', $roleId)
+                ->wherePivot('organization_id', $organizationId)
+                ->wherePivot('tool_id', $toolId)
+                ->detach();
         } catch (Exception $e) {
             // Handle any exceptions that occur during role revocation
-            throw new \Exception($e->getMessage());
+            throw new \Exception("Failed to revoke role: " . $e->getMessage());
         }
     }
 
@@ -75,6 +89,26 @@ class AssignRoleService
             ->wherePivot('tool_id', $toolId)
             ->pluck('role_id')
             ->toArray();
+    }
+
+    public function getRolesForOrganization($user, $organizationId)
+    {
+        $roles = $roles = $user->roles()
+            ->wherePivot('organization_id', $organizationId)
+            ->pluck('role_id')
+            ->toArray();
+
+        $tools  = $user->roles()
+                ->wherePivot('organization_id', $organizationId)
+                ->with('tools')
+                ->pluck('tool_id')
+                ->toArray();
+
+
+        return [
+            'roles' => $roles,
+            'tools' => $tools,
+        ];
     }
 
     private function addRoles($user, $roles, $organizationId, $toolId)

@@ -27,6 +27,7 @@ class AssignRoleController extends Controller
             try {
                 $user = User::findOrFail($request->user_uuid);
                 $this->assignRoleService->assignRole($user,$request->organizations);
+                $tools = $this->assignRoleService->getRolesForOrganization($user,$request->organizations); 
                 return response()->json(['message' => 'Role assigned successfully'], Response::HTTP_OK);
             } catch (Exception $e) {
                 return response()->json(['error' => 'An error occurred while assigning the role'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -37,7 +38,7 @@ class AssignRoleController extends Controller
     {
         try {
             $user = User::findOrFail($request->user_uuid);
-            $this->assignRoleService->revokeRole($user, $request->role_uuid);
+            $this->assignRoleService->revokeRole($user, $request->role_uuid, $request->organization_uuid, $request->tool_uuid);
             return response()->json(['message' => 'Role unassigned successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

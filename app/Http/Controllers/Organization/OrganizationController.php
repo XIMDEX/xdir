@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Organization;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Services\OrganizationService;
+use App\Services\OrganizationUserService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,11 +13,13 @@ use Illuminate\Http\Response;
 class OrganizationController extends Controller
 {
     protected $organizationService; 
+    protected $organizationUserService;
     protected $auth;
 
-    public function __construct(OrganizationService $organizationService,Guard $auth)
+    public function __construct(OrganizationService $organizationService,OrganizationUserService $organizationUserService,Guard $auth)
     {
         $this->organizationService = $organizationService;
+        $this->organizationUserService = $organizationUserService;
         $this->auth = $auth;
     }
 
@@ -24,8 +27,8 @@ class OrganizationController extends Controller
     {
         try {
             $result = $this->organizationService->createOrganization($request->all());
-
             if ($result['success']) {
+                $this->organizationUserService->addUserToOrganization($result['organization'], $this->auth->user());
                 return response()->json($result['organization'], Response::HTTP_CREATED);
             } else {
                 return response()->json(['error' => 'Failed to create organization'], Response::HTTP_BAD_REQUEST);
@@ -72,7 +75,7 @@ class OrganizationController extends Controller
     public function listOrganizations()
     {
         try {
-            $organizations = $this->organizationService->getAllOrganizations();
+            $organizations = $this->organizationUserService->getUserOrganizations($this->auth->user());
             return response()->json($organizations, Response::HTTP_OK);
         } catch (\Exception $e) {
             \Log::error('Error listing organizations: ' . $e->getMessage());

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Organization\OrganizationController;
 use App\Http\Controllers\Organization\OrganizationInviteController;
+use App\Http\Controllers\Organization\OrganizationUserController;
 use Illuminate\Support\Facades\Route;
 
 $missingCallback = function () {
@@ -12,6 +13,7 @@ $missingCallback = function () {
 Route::prefix('organizations')->middleware(['auth:api', 'role:admin|superadmin'])->group(function () use ($missingCallback) {
     Route::get('/', [OrganizationController::class, 'listOrganizations'])->name('api.organizations.list');
     Route::post('/{organization}/invite/{email}', [OrganizationInviteController::class, 'sendInvite'])->name('api.organizations.invite')->missing($missingCallback);
+    Route::get('/{uuid}/users', [OrganizationUserController::class, 'getUserListByOrganization'])->name('api.organizations.users')->missing($missingCallback);
     Route::get('/invitations', [OrganizationInviteController::class, 'invitationList'])->name('api.organizations.invites.list');
     Route::delete('/invitations/{uuid}', [OrganizationInviteController::class, 'delete'])->name('api.organizations.invites.delete')->missing($missingCallback);
 });

@@ -17,4 +17,9 @@ class Role extends SpatieRole
     {
         return $this->belongsToMany(Tool::class, 'model_has_roles', 'role_id', 'tool_id');
     }
+
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class, 'model_has_roles', 'role_id', 'organization_id');
+    }
 }

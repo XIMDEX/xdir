@@ -310,11 +310,11 @@ class UserService
             foreach ($roles as $role) {
                 $toolId = $role->pivot->tool_id;
                 $tool = $tools[$toolId];
-                $userToolRoles[$tool->hash] = [
+                $userToolRoles[$tool->hash][] = [
                     'organization' => $role->pivot->organization_id,
                     'permission' => $this->rolesBitwiseMap[strtolower($role->name)],
                     'role' => $role->name,
-                    'tool' => ['name' => $tool->name, 'type' => $tool->type]
+                    'tool' => ['name' => $tool->name, 'type' => $tool->type, 'uuid' => $tool->uuid]
                 ];
             }
             return $userToolRoles;
