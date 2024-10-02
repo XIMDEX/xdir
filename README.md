@@ -7,96 +7,82 @@ X   X  DDDD  I  R  RR
 ```
 
 # xdir-back-v2
-Backend de administración y registro de Usuarios y Roles
+Backend for User and Role Administration and Registration
 
-# Configuración inicial de xdir-back-v2
+# Initial Configuration of xdir-back-v2
 
-Este documento proporciona una guía paso a paso para configurar el entorno de desarrollo del backend de administración y registro de Usuarios y Roles, `xdir-back-v2`. Sigue cuidadosamente las instrucciones para asegurar una correcta configuración del proyecto.
-PHP8.2
+This document provides a step-by-step guide to setting up the development environment for the User and Role Administration and Registration backend, xdir-back-v2. Follow the instructions carefully to ensure a correct configuration of the project. PHP8.2
 
-## Requisitos previos
+## Prerequisites
 
-Antes de comenzar, asegúrate de tener instalado Git y Composer en tu sistema. Estas herramientas son esenciales para clonar el repositorio y gestionar las dependencias de PHP del proyecto.
+Before starting, make sure you have Git and Composer installed on your system. These tools are essential for cloning the repository and managing the PHP dependencies of the project.
 
-## Clonar el repositorio
+## Clone the Repository
 
-Para obtener el código fuente del proyecto, ejecuta el siguiente comando en tu terminal:
+To obtain the source code of the project, run the following command in your terminal:
 ```bash
 git clone git@github.com:XIMDEX/xdir-back-v2.git
 ```
 
-Este comando clona el repositorio en una nueva carpeta llamada xdir-back-v2 en tu directorio actual.
-Luego es necesario hacer un cd xdir-back-v2 para acceder al directorio. 
+This command clones the repository into a new folder called xdir-back-v2 in your current directory. Then, you need to run cd xdir-back-v2 to access the directory.
 
-## Cambiar a la rama de desarrollo
-Para trabajar con la versión de desarrollo más reciente, cambia a la rama develop:
-```bash
-git checkout develop
-```
 
-## Instalar las dependecias 
+## Install Dependencies
 ```bash
 composer install
 ```
-Este comando lee el archivo composer.json, descarga las dependencias requeridas y las instala en el directorio vendor.
+This command reads the composer.json file, downloads the required dependencies, and installs them in the vendor directory.
 
 ## ENV
 
-Copia el archivo .env.example para crear tu .env
+Copy the .env.example file to create your .env file:
 ```bash
 cp .env.example .env
 ```
-Y configurar las variables de entorno, sobretodo las de database. 
-Para que todos estos nuevos datos sean cargados es necesario ejecutar el siguiente comando: 
+And configure the environment variables, especially the database variables. To load these new settings, run the following command:
 ```bash
 php artisan optimize
 ```
-Y tras ello podemos verificar las rutas para ver que todo esta correcto:
+And then verify the routes to ensure everything is correct:
 ```bash
 php artisan route:list
 ```
 ## Migrate
-Es necesario hacer el migrate:
+Run the migration:
 ```bash
 php artisan migrate
 ```
-Ahora probar la ruta de /register, podemos usar los siguientes datos: 
+Now, test the /register route using the following data:
 ```bash
 {
   "email": "testXdir@ximdex.com",
   "password": "test123456",
   "name": "test",
-  "surname": "text para surname",
+  "surname": "text surname",
   "birthdate": "2020-10-10"
 }
 ```
-En la respuesta tendremos el token que nos servira para no tener que registar un mail real(Recuerda tener la app en modo debug, en el env, para obtener esta respuesta)
+In the response, you will receive a token that will allow you to avoid registering a real email address (Remember to have the app in debug mode in the env file to get this response).
 ## Keys
 ```bash
 php artisan key:generate
 ```
-Tambien hay que generar las keys para passport 
+Also, generate the keys for Passport:
 ```bash
 php artisan passport:keys
 ```
-Y asegurarnos de que tengan los permisos correctamente
+And ensure they have the correct permissions:
 ```bash
 sudo chown www-data:www-data storage/oauth-public.key storage/oauth-private.key
 ```
-Nos quedaria general la clave 
+Finally, generate the client secret:
 ```bash
 php artisan passport:client --personal.
 ```
-Al final recibiras dos variables que habra que guardar en el .env junto al nombre que se le haya asignado 
+You will receive two variables that you need to save in the .env file along with the assigned name:
 ```bash
-PASSPORT_PERSONAL_ACCESS_CLIENT_ID="tu_id_de_cliente"
-PASSPORT_SECRET="tu_secreto_cliente"
-PASSPORT_TOKEN_NAME="nombre_del_cliente"
+PASSPORT_PERSONAL_ACCESS_CLIENT_ID="your_client_id"
+PASSPORT_SECRET="your_client_secret"
+PASSPORT_TOKEN_NAME="client_name"
 ```
-Y acabamos con un php artisan optimize
-
-## Verificación de Email y Login
-
-Verificar el email: Para simular la verificación de email, accede a la ruta /email/verify/{token}, donde {token} es el token de verificación que obtuviste previamente.
-
-Probar el login: Una vez verificado el email, puedes proceder a probar el login mediante la ruta /login utilizando herramientas como Postman o cURL, proporcionando las credenciales de usuario (email y contraseña).
+And finish with a php artisan optimize command.
