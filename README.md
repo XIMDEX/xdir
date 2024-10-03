@@ -1,102 +1,106 @@
-```bash
-X   X  DDDD  I  RRRR
- X X   D   D I  R   R
-  X    D   D I  RRRR
- X X   D   D I  R R
-X   X  DDDD  I  R  RR
-```
+# XDIR: User and Role management (Backend)
 
-# xdir-back-v2
-Backend de administración y registro de Usuarios y Roles
+XDIR is acomprehensive user management system (registration, deactivation, and editing; credential recovery). This system also allows for the association of roles and organizations, as well as services within the XIMDEX Platform. 
 
-# Configuración inicial de xdir-back-v2
-
-Este documento proporciona una guía paso a paso para configurar el entorno de desarrollo del backend de administración y registro de Usuarios y Roles, `xdir-back-v2`. Sigue cuidadosamente las instrucciones para asegurar una correcta configuración del proyecto.
+This document provides a step-by-step guide to setting up the development environment for the User and Role management and registration backend, `xdir`. Follow the instructions carefully to ensure the proper configuration of the project.
 PHP8.2
 
-## Requisitos previos
+## Prerequisites
 
-Antes de comenzar, asegúrate de tener instalado Git y Composer en tu sistema. Estas herramientas son esenciales para clonar el repositorio y gestionar las dependencias de PHP del proyecto.
+Before starting, make sure you have Git and Composer installed on your system. These tools are essential to clone the repository and manage the PHP dependencies of the project.
 
-## Clonar el repositorio
+## Clone the repository
 
-Para obtener el código fuente del proyecto, ejecuta el siguiente comando en tu terminal:
+To get the project source code, run the following command in your terminal:
 ```bash
-git clone git@github.com:XIMDEX/xdir-back-v2.git
+git clone git@github.com:XIMDEX/xdir.git
 ```
 
-Este comando clona el repositorio en una nueva carpeta llamada xdir-back-v2 en tu directorio actual.
-Luego es necesario hacer un cd xdir-back-v2 para acceder al directorio. 
+This command clones the repository into a new folder named xdir in your current directory.
+Then, you need to run `cd xdir` to access the directory.
 
-## Cambiar a la rama de desarrollo
-Para trabajar con la versión de desarrollo más reciente, cambia a la rama develop:
+## Switch to the development branch
+
+To work with the latest development version, switch to the develop branch:
 ```bash
 git checkout develop
 ```
 
-## Instalar las dependecias 
+## Install dependencies
 ```bash
 composer install
 ```
-Este comando lee el archivo composer.json, descarga las dependencias requeridas y las instala en el directorio vendor.
+This command reads the composer.json file, downloads the required dependencies, and installs them into the vendor directory.
 
 ## ENV
 
-Copia el archivo .env.example para crear tu .env
+Copy the .env.example file to create your .env
 ```bash
 cp .env.example .env
 ```
-Y configurar las variables de entorno, sobretodo las de database. 
-Para que todos estos nuevos datos sean cargados es necesario ejecutar el siguiente comando: 
+And configure the environment variables, especially the database ones.
+For all these new settings to be loaded, you need to run the following command:
 ```bash
 php artisan optimize
 ```
-Y tras ello podemos verificar las rutas para ver que todo esta correcto:
+Then, we can verify the routes to make sure everything is correct:
 ```bash
 php artisan route:list
 ```
+
 ## Migrate
-Es necesario hacer el migrate:
+
+You need to run the migration:
 ```bash
 php artisan migrate
 ```
-Ahora probar la ruta de /register, podemos usar los siguientes datos: 
+
+Now, test the /register route. You can use the following data:
 ```bash
 {
-  "email": "testXdir@ximdex.com",
-  "password": "test123456",
+  "email": "testXdir@mydomain.com",
+  "password": "Test12345",
   "name": "test",
-  "surname": "text para surname",
+  "surname": "text for surname",
   "birthdate": "2020-10-10"
 }
 ```
-En la respuesta tendremos el token que nos servira para no tener que registar un mail real(Recuerda tener la app en modo debug, en el env, para obtener esta respuesta)
+
+In the response, you will receive a token that will allow you not to have to register a real email (Remember to have the app in debug mode, in the env, to get this response).
+
 ## Keys
 ```bash
 php artisan key:generate
 ```
-Tambien hay que generar las keys para passport 
+You also need to generate the keys for passport
 ```bash
 php artisan passport:keys
 ```
-Y asegurarnos de que tengan los permisos correctamente
+And ensure they have the correct permissions:
 ```bash
 sudo chown www-data:www-data storage/oauth-public.key storage/oauth-private.key
 ```
-Nos quedaria general la clave 
+
+We would need to generate the key:
 ```bash
 php artisan passport:client --personal.
 ```
-Al final recibiras dos variables que habra que guardar en el .env junto al nombre que se le haya asignado 
+
+In the end, you will receive two variables that must be stored in the .env file along with the assigned name:
 ```bash
-PASSPORT_PERSONAL_ACCESS_CLIENT_ID="tu_id_de_cliente"
-PASSPORT_SECRET="tu_secreto_cliente"
-PASSPORT_TOKEN_NAME="nombre_del_cliente"
+PASSPORT_PERSONAL_ACCESS_CLIENT_ID="your_client_id"
+PASSPORT_SECRET="your_client_secret"
+PASSPORT_TOKEN_NAME="client_name"
 ```
-Y acabamos con un php artisan optimize
+And finish with a php artisan optimize.
 
-## Verificación de Email y Login
+## Email Verification and Login
 
-Verificar el email: Para simular la verificación de email, accede a la ruta /email/verify/{token}, donde {token} es el token de verificación que obtuviste previamente.
+Verify the email: To simulate email verification, access the /email/verify/{token} route, where {token} is the verification token you previously obtained.
 
-Probar el login: Una vez verificado el email, puedes proceder a probar el login mediante la ruta /login utilizando herramientas como Postman o cURL, proporcionando las credenciales de usuario (email y contraseña).
+Test login: Once the email is verified, you can proceed to test login through the /login route using tools like Postman or cURL, providing the user credentials (email and password).
+```
+
+
+
+
