@@ -27,13 +27,14 @@ class ToolService
     {
         try {
             $toolService = $this->tool->find($serviceId);
-            if (!$toolService) {
+            if (!$toolService || !$toolService->url) {
                 throw new Exception('Tool service not found');
             }
             
+
             $serviceUrl = $toolService->url;
-            $url = $serviceUrl . '/xdir';
-            $data = ['user' => $user, 'toolId' => $serviceId];
+            $url = $serviceUrl . '/xdir?XDEBUG_SESSION_START';
+            $data = ['user' => $user,'password' => $user->password, 'toolId' => $serviceId];
             $payload = $this->payloadBuilder->setData($data)->setAction('createUser')->build();
             $response = $this->curlService->post($url, $payload);
             $data = json_decode($response);
@@ -55,6 +56,10 @@ class ToolService
             ]);
             throw $e;
         }
+    }
+
+    public function findServiceById($serviceId){
+        return $this->tool->find($serviceId);
     }
 
 

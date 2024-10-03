@@ -11,3 +11,4 @@
    require __DIR__ . '/role.php';
    require __DIR__ . '/organization.php';
    require __DIR__ . '/tool.php';
+   require __DIR__ . '/key.php';
