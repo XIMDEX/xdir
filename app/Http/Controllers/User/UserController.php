@@ -4,11 +4,14 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserPaginationRequest;
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -41,6 +44,24 @@ class UserController extends Controller
         try {
             $user = $this->userService->getUserById($id);
             $user->makeHidden(['password', 'remember_token', 'email_verified_at', 'created_at', 'updated_at', 'roles']);
+            
+            // Check if the authenticated user has the teacher role
+            if ($this->auth->user() && $this->auth->user()->roles && $this->auth->user()->roles->contains('name', 'teacher')) {
+                // Get the organization IDs of the authenticated user
+                $organizationIds = $this->auth->user()->organizations->pluck('uuid')->toArray();
+                
+                // Get all users from the same organizations (only id and name)
+                $organizationUsers = User::whereHas('organizations', function($query) use ($organizationIds) {
+                    $query->whereIn('organization_uuid', $organizationIds);
+                })->select('uuid', 'name', 'surname')->get();
+                
+                // Add the organization users to the response
+                return response()->json([
+                    'user' => $user,
+                    'organization_users' => $organizationUsers
+                ]);
+            }
+            
             return response()->json(['user' => $user]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -69,5 +90,35 @@ class UserController extends Controller
     {
         $user = Auth::guard('api')->user();
         return response()->json(['user' => $user]);
+    }
+
+    /**
+     * Get multiple users by their IDs
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUsersByIds(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'ids' => 'required|array',
+                'ids.*' => 'string|exists:users,uuid'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+            $userIds = $request->input('ids');
+            $users = User::whereIn('uuid', $userIds)
+                ->select('uuid', 'name', 'surname')
+                ->get();
+
+            return response()->json(['users' => $users]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching users.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
