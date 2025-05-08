@@ -12,3 +12,7 @@ Route::group(['middleware' => ['auth:api', 'role:admin|superadmin'], 'prefix' =>
     Route::get('/', [UserController::class, 'listUsers'])->name('api.users.list');
     Route::delete('/{id}', [UserController::class, 'deleteUser'])->name('api.users.delete');
 });
+
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function () {
+    Route::post('/by-ids', [UserController::class, 'getUsersByIds'])->name('api.users.by-ids');
+});
