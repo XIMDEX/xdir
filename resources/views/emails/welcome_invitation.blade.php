@@ -7,7 +7,7 @@
     <style>
         /* Base styles */
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -17,85 +17,110 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
             background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo-container {
+            text-align: center;
+            background-color: #f5f5f5;
+            padding: 20px 0;
+        }
+        .logo {
+            height: 40px;
+            width: auto;
         }
         .header {
             text-align: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #eaeaea;
-        }
-        .logo {
-            max-width: 150px;
-            height: auto;
-        }
-        .content {
             padding: 30px 20px;
+            background-color: #ffffff;
         }
         h1 {
-            color: #2c3e50;
+            color: #0047AB;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin: 0;
+            font-weight: bold;
         }
-        h2 {
-            color: #3498db;
-            font-size: 20px;
-            margin-top: 25px;
-            margin-bottom: 15px;
+        .content {
+            padding: 0 30px 30px;
+            background-color: #ffffff;
         }
         p {
-            margin-bottom: 15px;
+            margin: 15px 0;
             font-size: 16px;
+            color: #333;
+        }
+        .section-title {
+            color: #0047AB;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 25px 0 15px;
+            text-align: center;
+        }
+        .button-container {
+            text-align: center;
+            margin: 25px 0;
         }
         .button {
             display: inline-block;
-            background-color: #3498db;
+            background-color: #0047AB;
             color: #ffffff !important;
             text-decoration: none;
             padding: 12px 25px;
             border-radius: 4px;
             font-weight: bold;
-            margin: 20px 0;
             text-align: center;
+            font-size: 16px;
         }
-        .button:hover {
-            background-color: #2980b9;
+        .account-details {
+            margin: 25px 0;
+        }
+        .account-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .account-icon {
+            color: #0047AB;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .expiration-notice {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .help-section {
+            margin: 25px 0;
         }
         .footer {
             text-align: center;
             padding: 20px;
-            font-size: 14px;
-            color: #7f8c8d;
+            font-size: 12px;
+            color: #666;
             border-top: 1px solid #eaeaea;
         }
         .social-links {
             margin: 15px 0;
+            text-align: center;
         }
         .social-links a {
             display: inline-block;
             margin: 0 10px;
-            color: #3498db;
+            color: #666;
             text-decoration: none;
         }
-        .details {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-        .highlight {
-            font-weight: bold;
-            color: #3498db;
+        .fallback-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 15px;
+            text-align: center;
         }
         @media only screen and (max-width: 600px) {
             .container {
                 width: 100%;
             }
-            h1 {
-                font-size: 22px;
-            }
             .content {
-                padding: 20px 15px;
+                padding: 0 20px 20px;
             }
         }
     </style>
@@ -103,52 +128,26 @@
 <body>
     <div class="container">
         <div class="header">
-            <!-- If you have a logo, uncomment this line and add your logo URL -->
-            <!-- <img src="{{ $logoUrl ?? '' }}" alt="{{ $organizationName }}" class="logo"> -->
-            <h1>Welcome to {{ $organizationName }}!</h1>
+            <h1>Welcome to Cognitrek</h1>
         </div>
         
         <div class="content">
             <p>Hello {{ $name }},</p>
             
-            <p>We're thrilled to welcome you to <span class="highlight">{{ $organizationName }}</span>! You've been invited to join our platform, and we're excited to have you on board.</p>
+            <p>We're thrilled to welcome you to <strong>Cognitrek!</strong> 🚀 You've been invited by <strong>{{ $invitedBy ?? 'our team' }}</strong> to join our platform, and we're excited to have you on board.</p>
             
-            <h2>Getting Started</h2>
+            <div class="section-title">Getting Started</div>
+            
             <p>To complete your registration and access your account, please click the button below:</p>
             
-            <div style="text-align: center;">
-                <a href="{{ $invitationLink }}" class="button">Accept Invitation</a>
+            <div class="button-container">
+                <a href="{{ $invitationLink ?? '#' }}" class="button">ACCEPT INVITATION</a>
             </div>
-            
-            <p>This invitation link will expire in <span class="highlight">{{ $expirationDays ?? 7 }} days</span>, so please make sure to register soon.</p>
-            
-            <div class="details">
-                <h2>Your Account Details</h2>
-                <p><strong>Email:</strong> {{ $email }}</p>
-                <p><strong>Organization:</strong> {{ $organizationName }}</p>
-                @if(isset($role))
-                <p><strong>Role:</strong> {{ $role }}</p>
-                @endif
-            </div>
-            
-            <h2>Need Help?</h2>
-            <p>If you have any questions or need assistance, please don't hesitate to contact our support team at <a href="mailto:{{ $supportEmail ?? 'support@example.com' }}">{{ $supportEmail ?? 'support@example.com' }}</a>.</p>
-            
-            <p>We look forward to seeing you inside!</p>
-            
-            <p>Best regards,<br>The {{ $organizationName }} Team</p>
         </div>
         
         <div class="footer">
-            <p>&copy; {{ date('Y') }} {{ $organizationName }}. All rights reserved.</p>
-            
-            @if(isset($unsubscribeLink))
-            <p><small><a href="{{ $unsubscribeLink }}">Unsubscribe</a> from these emails.</small></p>
-            @endif
-            
-            @if(isset($privacyPolicyLink))
-            <p><small>View our <a href="{{ $privacyPolicyLink }}">Privacy Policy</a>.</small></p>
-            @endif
+            <p>If the link above isn't working, you can also access the invitation link <a href="{{ $invitationLink ?? '#' }}">{{ $invitationLink ?? '#' }}</a>.</p>
+            <p>Copyright © {{ date('Y') }} Ximdex. All rights reserved.</p>
         </div>
     </div>
 </body>
