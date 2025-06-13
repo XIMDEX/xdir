@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Email\SendEmailController;
 use App\Http\Controllers\Email\TemplateController;
+use App\Http\Controllers\QaBetaController;
 use Illuminate\Support\Facades\Route;
 
 // Email Routes
@@ -14,3 +15,6 @@ Route::prefix('email')->middleware('auth:api')->group(function () {
     Route::get('/templates', [TemplateController::class, 'getTemplates'])->name('api.email.templates');
     Route::get('/templates/{template}', [TemplateController::class, 'getTemplate'])->name('api.email.template');
 });
+
+// Public route for QA beta waitlist signup (no auth required)
+Route::post('/qa-beta-waitlist', [QaBetaController::class, 'sendInvitation'])->name('api.qa_beta.waitlist');

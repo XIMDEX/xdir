@@ -73,7 +73,6 @@ class SendEmailController extends Controller
     public function sendBulkEmail(SendBulkEmailRequest $request)
     {
         try {
-
             // Get validated data as an array
             $emailData = $request->only(['recipients', 'subject', 'template', 'cc', 'bcc']);
             $emailData['attachments'] = $request->input('attachments', []);
@@ -83,6 +82,7 @@ class SendEmailController extends Controller
                 $emailData['recipients'],
                 $emailData['subject'],
                 $emailData['template'],
+                $request->input('data', []),
                 $emailData['cc'] ?? null,
                 $emailData['bcc'] ?? null,
                 $emailData['attachments']
