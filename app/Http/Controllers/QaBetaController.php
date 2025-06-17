@@ -53,7 +53,7 @@ class QaBetaController extends Controller
                 'name' => $name,
                 'supportEmail' => config('mail.support_email', 'support@ximdex.com'),
                 'unsubscribeLink' => url('https://front2.cognitrek.ximdex.net/unsubscribe'),
-                'privacyPolicyLink' => url('https://front2.cognitrek.ximdex.net/privacy-policy')
+                'privacyPolicyLink' => url('https://ximdex.com/declaracion-de-privacidad/')
             ];
 
             // Send the email

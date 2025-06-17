@@ -163,7 +163,6 @@
             <p>© {{ date('Y') }} Ximdex. All rights reserved.</p>
             <p>You're receiving this email because you've joined the waitlist for the CogniTrek Beta program.</p>
             <p style="margin-top: 15px;">
-                <a href="{{ $unsubscribeLink }}" style="color: #4a6cf7; text-decoration: none; margin: 0 10px;">Unsubscribe</a> • 
                 <a href="{{ $privacyPolicyLink }}" style="color: #4a6cf7; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
             </p>
         </div>
