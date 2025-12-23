@@ -3,7 +3,7 @@
 XDIR is acomprehensive user management system (registration, deactivation, and editing; credential recovery). This system also allows for the association of roles and organizations, as well as services within the XIMDEX Platform. 
 
 This document provides a step-by-step guide to setting up the development environment for the User and Role management and registration backend, `xdir`. Follow the instructions carefully to ensure the proper configuration of the project.
-PHP8.2
+PHP8.2 
 
 ## Prerequisites
 
